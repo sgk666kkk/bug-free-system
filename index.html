@@ -1,0 +1,3206 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>油田化学番禺流花药剂管理系统 - 出运需求自动生成及订单管理平台</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- SheetJS for Excel handling -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Three.js for 3D effects -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.140.1/build/three.min.js"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1677ff',
+                        secondary: '#52c41a',
+                        danger: '#ff4d4f',
+                        warning: '#fa8c16',
+                        success: '#36c768',
+                        info: '#e6f7ff',
+                        dark: '#0a1929',
+                        'dark-card': '#0f2942',
+                        'dark-border': '#1e3a5f',
+                        'dark-text': '#ffffff',
+                        'dark-text-secondary': '#a0c4ff',
+                        'primary-hover': '#0d66d0',
+                        'danger-hover': '#d93025',
+                        'warning-hover': '#d97706',
+                        'success-hover': '#2db35c',
+                        'tech-blue': '#0066cc',
+                        'tech-blue-light': '#3399ff',
+                        'tech-blue-dark': '#004c99',
+                        'tech-gradient-1': '#0066cc',
+                        'tech-gradient-2': '#0099ff',
+                        'tech-gradient-3': '#33ccff'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        card: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'button': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'button-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'red-box': '0 0 0 2px #ff4d4f, 0 0 0 4px rgba(255, 77, 79, 0.2)'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'button-bounce': 'buttonBounce 0.3s ease-out',
+                        'button-shadow': 'buttonShadow 0.3s ease-out',
+                        'red-box-pulse': 'redBoxPulse 1s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        buttonBounce: {
+                            '0%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(0.98)' },
+                            '100%': { transform: 'scale(1)' }
+                        },
+                        buttonShadow: {
+                            '0%': { boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' },
+                            '100%': { boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }
+                        },
+                        redBoxPulse: {
+                            '0%, 100%': { boxShadow: '0 0 0 2px #ff4d4f, 0 0 0 4px rgba(255, 77, 79, 0.2)' },
+                            '50%': { boxShadow: '0 0 0 3px #ff4d4f, 0 0 0 6px rgba(255, 77, 79, 0.3)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            .card {
+                @apply bg-dark-card rounded-lg shadow-card p-6 transition-all-300 border border-dark-border;
+            }
+            .card:hover {
+                @apply shadow-card-hover transform hover:-translate-y-1;
+            }
+            .card-title {
+                @apply text-xl font-bold text-dark-text mb-4 flex items-center gap-2;
+            }
+            .btn {
+                @apply px-4 py-2 rounded-lg font-medium transition-all-300 flex items-center justify-center gap-2 shadow-button hover:shadow-button-hover;
+            }
+            .btn-primary {
+                @apply bg-gradient-to-r from-primary to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+            }
+            .btn-secondary {
+                @apply bg-gradient-to-r from-secondary to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+            }
+            .btn-danger {
+                @apply bg-gradient-to-r from-danger to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+            }
+            .btn-warning {
+                @apply bg-gradient-to-r from-warning to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+            }
+            .btn-outline {
+                @apply border border-dark-border text-dark-text hover:bg-dark-card hover:border-gray-400 shadow-sm hover:shadow;
+            }
+            .input-field {
+                @apply w-full px-4 py-2.5 border border-dark-border bg-dark-card rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 shadow-sm;
+            }
+            .input-field:focus {
+                @apply shadow-md border-primary;
+            }
+            .table-header {
+                @apply bg-gradient-to-r from-dark-card to-dark-card/80 text-dark-text-secondary font-medium;
+            }
+            .badge {
+                @apply px-2 py-1 text-xs rounded-full font-medium;
+            }
+            .file-input {
+                @apply px-4 py-2.5 border border-dark-border rounded-lg text-sm bg-dark-card hover:border-gray-400 transition-all duration-200 shadow-sm;
+            }
+            .file-input:hover {
+                @apply shadow-md border-primary;
+            }
+            .upload-item {
+                @apply p-4 bg-gradient-to-br from-dark to-dark-card rounded-lg border border-dark-border shadow-sm hover:shadow-md transition-all duration-300;
+            }
+            .operation-card {
+                @apply bg-gradient-to-br from-dark-card to-blue-900/20 rounded-lg shadow-lg border border-blue-800/30 p-6 hover:shadow-xl transition-all duration-300;
+            }
+            .operation-btn {
+                @apply w-full btn btn-primary text-base py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300;
+            }
+            .stats-card {
+                @apply bg-gradient-to-br from-dark-card to-green-900/20 rounded-lg shadow-md border border-green-800/30 p-4 hover:shadow-lg transition-all duration-300;
+            }
+            .stats-number {
+                @apply text-2xl font-bold text-green-400;
+            }
+            .stats-label {
+                @apply text-sm text-dark-text-secondary font-medium;
+            }
+            .badge-danger {
+                @apply bg-red-900/30 text-red-400;
+            }
+            .badge-warning {
+                @apply bg-yellow-900/30 text-yellow-400;
+            }
+            .badge-success {
+                @apply bg-green-900/30 text-green-400;
+            }
+            .badge-info {
+                @apply bg-blue-900/30 text-blue-400;
+            }
+            .btn-animated {
+                @apply relative overflow-hidden transition-all duration-300;
+            }
+            .btn-animated::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: all 0.5s;
+            }
+            .btn-animated:hover::before {
+                left: 100%;
+            }
+            .btn-animated:active {
+                animation: button-bounce 0.3s ease-out;
+            }
+        }
+    </style>
+    
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* 背景动画 */
+        #animationBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+        
+        /* 表格行悬停效果 */
+        tbody tr:hover {
+            background-color: rgba(22, 119, 255, 0.05);
+        }
+        
+        /* 加载动画 */
+        .loading-spinner {
+            border: 3px solid rgba(22, 119, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #1677ff;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 折线装饰 */
+        .polyline-decoration {
+            position: relative;
+        }
+        .polyline-decoration::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' class='text-primary'%3E%3Cpolyline points='5,12 10,7 19,16' fill='none' stroke='%231677ff' stroke-width='2'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        /* 红框编辑动画 */
+        .red-box-editing {
+            border: 2px solid #ff4d4f !important;
+            box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+            animation: redBoxPulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes redBoxPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 2px #ff4d4f, 0 0 0 4px rgba(255, 77, 79, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 0 3px #ff4d4f, 0 0 0 6px rgba(255, 77, 79, 0.3);
+            }
+        }
+        
+        /* 按钮动画 */
+        .btn-animate {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-animate::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+        
+        .btn-animate:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* 分页按钮样式 */
+        .page-btn {
+            @apply px-3 py-1 rounded-lg border border-dark-border text-dark-text hover:bg-primary hover:text-white hover:border-primary transition-all duration-200;
+        }
+        
+        .page-btn.active {
+            @apply bg-primary text-white border-primary;
+        }
+        
+        .page-btn:disabled {
+            @apply opacity-50 cursor-not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-dark min-h-screen font-sans text-dark-text">
+    <!-- 背景动画 -->
+    <canvas id="animationBackground"></canvas>
+    
+    <!-- 顶部导航栏 -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-800 text-white shadow-lg sticky top-0 z-50 relative overflow-hidden">
+        <!-- 背景装饰 -->
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_80%,rgba(255,255,255,0.3)_0%,transparent_50%)]"></div>
+            <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-white rounded-full filter blur-3xl opacity-10"></div>
+            <div class="absolute bottom-1/4 left-1/3 w-48 h-48 bg-white rounded-full filter blur-3xl opacity-10"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between relative z-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/30">
+                    <i class="fa fa-flask text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+                        油田化学番禺流花药剂管理系统
+                    </h1>
+                    <p class="text-blue-100 text-sm md:text-base mt-1">
+                        出运需求自动生成及订单管理平台
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="btn bg-white/20 hover:bg-white/30 text-white border-white/30 px-4 py-2 rounded-lg transition-all duration-200 backdrop-blur-sm btn-animated">
+                    <i class="fa fa-bell-o mr-2"></i>
+                    <span class="relative">
+                        通知
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-danger rounded-full text-white text-xs flex items-center justify-center">2</span>
+                    </span>
+                </button>
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+                    <div class="w-10 h-10 bg-white/30 rounded-full flex items-center justify-center">
+                        <i class="fa fa-user text-white"></i>
+                    </div>
+                    <span class="text-sm font-medium hidden md:block">管理员</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 系统概览卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="card bg-gradient-to-br from-blue-900/30 to-dark-card border-l-4 border-primary">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-sm text-dark-text-secondary mb-1">待处理出运需求</p>
+                        <h3 class="text-2xl font-bold text-primary" id="pendingCount">0</h3>
+                        <p class="text-xs text-dark-text-secondary mt-1">较昨日 <span class="text-green-400">+12%</span></p>
+                    </div>
+                    <div class="w-10 h-10 bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <i class="fa fa-truck text-primary"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-gradient-to-br from-yellow-900/30 to-dark-card border-l-4 border-warning">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-sm text-dark-text-secondary mb-1">即将到期订单</p>
+                        <h3 class="text-2xl font-bold text-warning" id="expiringCount">0</h3>
+                        <p class="text-xs text-dark-text-secondary mt-1">较昨日 <span class="text-red-400">+5%</span></p>
+                    </div>
+                    <div class="w-10 h-10 bg-yellow-900/30 rounded-full flex items-center justify-center">
+                        <i class="fa fa-clock-o text-warning"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-gradient-to-br from-red-900/30 to-dark-card border-l-4 border-danger">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-sm text-dark-text-secondary mb-1">超订单余量</p>
+                        <h3 class="text-2xl font-bold text-danger" id="overOrderCount">0</h3>
+                        <p class="text-xs text-dark-text-secondary mt-1">较昨日 <span class="text-green-400">-3%</span></p>
+                    </div>
+                    <div class="w-10 h-10 bg-red-900/30 rounded-full flex items-center justify-center">
+                        <i class="fa fa-exclamation-triangle text-danger"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-gradient-to-br from-green-900/30 to-dark-card border-l-4 border-secondary">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-sm text-dark-text-secondary mb-1">已完成订单</p>
+                        <h3 class="text-2xl font-bold text-secondary" id="completedCount">0</h3>
+                        <p class="text-xs text-dark-text-secondary mt-1">较昨日 <span class="text-green-400">+8%</span></p>
+                    </div>
+                    <div class="w-10 h-10 bg-green-900/30 rounded-full flex items-center justify-center">
+                        <i class="fa fa-check-circle text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 数据可视化区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- 订单状态分布 -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold card-title">
+                        <i class="fa fa-pie-chart"></i>
+                        订单状态分布
+                    </h3>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline px-3 py-1 text-xs btn-animated">
+                            <i class="fa fa-download"></i>
+                            导出
+                        </button>
+                    </div>
+                </div>
+                <div class="h-48">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- 药剂需求量趋势 -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold card-title">
+                        <i class="fa fa-line-chart"></i>
+                        药剂需求量趋势
+                    </h3>
+                    <div class="flex gap-2">
+                        <select class="input-field text-sm py-1" id="trendTimeRange">
+                            <option value="7">近7天</option>
+                            <option value="30" selected="">近30天</option>
+                            <option value="90">近90天</option>
+                        </select>
+                        <button class="btn btn-outline px-3 py-1 text-xs btn-animated">
+                            <i class="fa fa-download"></i>
+                            导出
+                        </button>
+                    </div>
+                </div>
+                <div class="h-48">
+                    <canvas id="demandTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 低于15日库存的药剂库存数据表 -->
+        <div class="card mb-6" id="lowStockTableCard">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold card-title">
+                    <i class="fa fa-exclamation-circle text-warning"></i>
+                    低于15日库存的药剂库存数据表
+                </h3>
+                <div class="flex gap-2">
+                    <span class="text-sm text-dark-text-secondary">
+                        共 <span id="lowStockCount" class="font-medium text-warning">0</span> 种药剂库存不足
+                    </span>
+                    <button class="btn btn-outline px-3 py-1 text-xs btn-animated" id="exportLowStockBtn">
+                        <i class="fa fa-download"></i>
+                        导出
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="lowStockTable" class="w-full text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-3 py-2 text-left">序号</th>
+                            <th class="px-3 py-2 text-left">药剂名称</th>
+                            <th class="px-3 py-2 text-left">型号</th>
+                            <th class="px-3 py-2 text-left">送货设施</th>
+                            <th class="px-3 py-2 text-right">日消耗量(L)</th>
+                            <th class="px-3 py-2 text-right">现场库存量(L)</th>
+                            <th class="px-3 py-2 text-right">库存天数</th>
+                            <th class="px-3 py-2 text-left">库存状态</th>
+                            <th class="px-3 py-2 text-left">建议出运量(罐)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lowStockTableBody">
+                        <tr>
+                            <td colspan="9" class="px-3 py-8 text-center text-dark-text-secondary">
+                                <div class="flex flex-col items-center">
+                                    <i class="fa fa-info-circle text-3xl text-dark-border mb-2"></i>
+                                    <p>暂无低于15日库存的药剂数据</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 原有上传区域 -->
+        <div class="card mb-6">
+            <h3 class="text-xl font-bold mb-6 card-title">
+                <i class="fa fa-upload"></i>
+                1. 基础数据上传
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="upload-item">
+                        <label class="block text-sm font-medium text-dark-text mb-2 flex items-center gap-2">
+                            <i class="fa fa-file-excel-o text-green-400"></i>
+                            日报表Excel
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="file" id="dailyReportFile" accept=".xlsx,.xls" class="file-input flex-1">
+                            <span class="text-xs text-primary font-medium" id="dailyMemo"></span>
+                        </div>
+                    </div>
+                    <div class="upload-item">
+                        <label class="block text-sm font-medium text-dark-text mb-2 flex items-center gap-2">
+                            <i class="fa fa-cubes text-blue-400"></i>
+                            物料编码表
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="file" id="materialCodeFile" accept=".xlsx,.xls" class="file-input flex-1">
+                            <span class="text-xs text-primary font-medium" id="materialMemo"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="upload-item">
+                        <label class="block text-sm font-medium text-dark-text mb-2 flex items-center gap-2">
+                            <i class="fa fa-shopping-cart text-purple-400"></i>
+                            订单余量数据表
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="file" id="orderFile" accept=".xlsx,.xls" class="file-input flex-1">
+                            <span class="text-xs text-primary font-medium" id="orderMemo"></span>
+                        </div>
+                    </div>
+                    <div class="upload-item">
+                        <label class="block text-sm font-medium text-dark-text mb-2 flex items-center gap-2">
+                            <i class="fa fa-tint text-blue-500"></i>
+                            罐动态数据表
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="file" id="tankDynamicFile" accept=".xlsx,.xls" class="file-input flex-1">
+                            <span class="text-xs text-primary font-medium" id="tankMemo"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-dark-text mb-1">选择船期日期</label>
+                <div class="relative">
+                    <input type="date" id="shipDateSet" class="input-field max-w-md pr-10 cursor-pointer">
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-dark-text-secondary mt-1">点击输入框直接弹出日历选择器</p>
+            </div>
+            <div class="flex flex-wrap gap-3 mt-6">
+                <button id="generateBtn" class="btn btn-primary btn-animated">
+                    <i class="fa fa-file-text-o"></i>
+                    生成出运需求表
+                </button>
+                <button id="exportBtn" class="btn btn-secondary btn-animated">
+                    <i class="fa fa-download"></i>
+                    导出出运需求Excel
+                </button>
+                <button id="clearBtn" class="btn btn-danger btn-animated">
+                    <i class="fa fa-trash-o"></i>
+                    清除文件记忆
+                </button>
+            </div>
+            <div class="mt-6 p-5 bg-gradient-to-br from-blue-900/20 to-blue-800/10 rounded-lg border border-blue-800/30 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <div class="bg-primary/10 p-2 rounded-lg">
+                        <i class="fa fa-info-circle text-primary text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-primary mb-3">系统使用说明</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h5 class="font-medium text-dark-text mb-2 flex items-center gap-2">
+                                    <i class="fa fa-file-excel-o text-green-400"></i>
+                                    数据上传要求
+                                </h5>
+                                <ul class="list-disc pl-5 space-y-2 text-dark-text-secondary">
+                                    <li>支持Excel格式（.xlsx, .xls）的数据文件上传</li>
+                                    <li>物料编码表：包含药剂名称、型号、预算项目、物料编码等信息</li>
+                                    <li>订单余量数据表：包含订单号、项目号、药剂信息、剩余数量等</li>
+                                    <li>罐动态数据表：包含油田、平台、药剂信息、日消耗量、库存量等</li>
+                                    <li>文件上传后会自动保存，下次打开页面时直接加载</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-dark-text mb-2 flex items-center gap-2">
+                                    <i class="fa fa-table text-blue-400"></i>
+                                    表格操作说明
+                                </h5>
+                                <ul class="list-disc pl-5 space-y-2 text-dark-text-secondary">
+                                    <li><span class="text-red-400 font-medium">红色行</span>：表示超订单余量或订单超期</li>
+                                    <li><span class="text-yellow-400 font-medium">黄色行</span>：表示订单即将到期（7天内）</li>
+                                    <li><span class="text-green-400 font-medium">绿色行</span>：表示库存充足（&gt;30天）</li>
+                                    <li><span class="text-blue-400 font-medium">蓝色行</span>：表示总包药剂</li>
+                                    <li>备注列支持点击单元格直接编辑保存</li>
+                                    <li>罐数可通过编辑按钮修改，系统会自动检查是否超订单</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-dark-text mb-2 flex items-center gap-2">
+                                    <i class="fa fa-filter text-purple-400"></i>
+                                    筛选与查询
+                                </h5>
+                                <ul class="list-disc pl-5 space-y-2 text-dark-text-secondary">
+                                    <li>支持按平台、型号、预算项目进行多维度筛选</li>
+                                    <li>可设置罐数范围进行精确筛选</li>
+                                    <li>筛选条件可随时重置，恢复全部数据</li>
+                                    <li>表格支持分页浏览，每页显示30条记录</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-dark-text mb-2 flex items-center gap-2">
+                                    <i class="fa fa-flask text-orange-400"></i>
+                                    实验室耗材特殊处理
+                                </h5>
+                                <ul class="list-disc pl-5 space-y-2 text-dark-text-secondary">
+                                    <li>系统自动识别预算项目为"45、实验室耗材"的记录</li>
+                                    <li>实验室耗材包装形式自动设置为"EA"单位</li>
+                                    <li>实验室耗材不按罐计算，直接使用订单剩余数量</li>
+                                    <li>编辑实验室耗材时显示正确的EA单位和合理的最大可出数量</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增订单剩余量衰减区域 -->
+        <div class="card mb-6 border-l-4 border-primary">
+            <h3 class="text-xl font-bold mb-6 card-title">
+                <i class="fa fa-calculator"></i>
+                2. 订单剩余量自动衰减
+            </h3>
+            <div class="upload-item mb-6">
+                <label class="block text-sm font-medium text-dark-text mb-2 flex items-center gap-2">
+                    <i class="fa fa-file-text-o text-blue-400"></i>
+                    发货记录表
+                </label>
+                <div class="flex items-center gap-3">
+                    <input type="file" id="shipmentFile" accept=".xlsx,.xls" class="file-input flex-1">
+                    <span class="text-xs text-primary font-medium" id="shipmentMemo"></span>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-4">
+                <button id="attenuateBtn" class="btn btn-primary operation-btn btn-animated">
+                    <i class="fa fa-calculator"></i>
+                    执行订单剩余量衰减
+                </button>
+                <button id="downloadAttenuateBtn" class="btn btn-secondary flex-1 py-3 rounded-lg font-semibold btn-animated" disabled="">
+                    <i class="fa fa-download"></i>
+                    下载衰减相关文件
+                </button>
+                <button id="clearAttenuateBtn" class="btn btn-danger flex-1 py-3 rounded-lg font-semibold btn-animated">
+                    <i class="fa fa-trash-o"></i>
+                    清除衰减记录
+                </button>
+            </div>
+            <div class="mt-4 p-3 bg-yellow-900/20 rounded-md text-sm text-dark-text-secondary">
+                <div class="flex items-start gap-2">
+                    <i class="fa fa-lightbulb-o text-warning mt-0.5"></i>
+                    <div>
+                        <p class="font-medium text-warning mb-1">衰减规则：</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>自动识别发货记录中的PO号/项目号、药剂型号、设施，匹配订单后扣减剩余量</li>
+                            <li>发货量&gt;剩余量时自动将剩余量设为0，标记为「超量发货」</li>
+                            <li>订单剩余量为0时标记为「已完成」</li>
+                            <li>执行后自动生成「更新后订单表」「匹配对照表」「操作日志」3个文件</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增衰减结果展示区域 -->
+        <div class="card mb-6" id="attenuateResultArea" style="display: none;">
+            <h3 class="text-xl font-bold mb-6 card-title">
+                <i class="fa fa-bar-chart"></i>
+                3. 衰减操作结果
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div class="stats-card animate-fade-in">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="stats-label">总发货记录数</p>
+                        <i class="fa fa-file-text-o text-blue-400"></i>
+                    </div>
+                    <p class="stats-number" id="totalShipmentCount">0</p>
+                </div>
+                <div class="stats-card animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="stats-label">成功匹配数</p>
+                        <i class="fa fa-check-circle text-green-400"></i>
+                    </div>
+                    <p class="stats-number text-green-400" id="matchedCount">0</p>
+                </div>
+                <div class="stats-card animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="stats-label">衰减记录数</p>
+                        <i class="fa fa-calculator text-purple-400"></i>
+                    </div>
+                    <p class="stats-number text-purple-400" id="attenuatedCount">0</p>
+                </div>
+                <div class="stats-card animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="stats-label">超量发货数</p>
+                        <i class="fa fa-exclamation-triangle text-red-400"></i>
+                    </div>
+                    <p class="stats-number text-red-400" id="overShipmentCount">0</p>
+                </div>
+                <div class="stats-card animate-fade-in" style="animation-delay: 0.4s;">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="stats-label">已完成订单数</p>
+                        <i class="fa fa-flag-checkered text-orange-400"></i>
+                    </div>
+                    <p class="stats-number text-orange-400" id="completedOrderCount">0</p>
+                </div>
+            </div>
+            
+            <!-- 衰减统计图表 -->
+            <div class="h-64 mb-4">
+                <canvas id="attenuateStatsChart"></canvas>
+            </div>
+            
+            <h4 class="font-medium text-dark-text mb-2">衰减操作日志</h4>
+            <div class="overflow-x-auto">
+                <table id="attenuateLogTable" class="w-full text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-3 py-2 text-left">操作时间</th>
+                            <th class="px-3 py-2 text-left">发货记录ID</th>
+                            <th class="px-3 py-2 text-left">订单号(PO)</th>
+                            <th class="px-3 py-2 text-left">项目号</th>
+                            <th class="px-3 py-2 text-left">药剂型号</th>
+                            <th class="px-3 py-2 text-left">设施</th>
+                            <th class="px-3 py-2 text-right">发货数量</th>
+                            <th class="px-3 py-2 text-right">衰减前剩余量</th>
+                            <th class="px-3 py-2 text-right">衰减后剩余量</th>
+                            <th class="px-3 py-2 text-left">衰减状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attenuateLogBody">
+                        <tr>
+                            <td colspan="10" class="px-3 py-4 text-center text-dark-text-secondary">暂无衰减操作记录</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 原有筛选区域 -->
+        <div class="card mb-6" id="filterBox" style="display: none;">
+            <h3 class="text-xl font-bold mb-6 card-title">
+                <i class="fa fa-filter"></i>
+                4. 数据筛选
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-dark-text mb-1">筛选平台</label>
+                    <select id="filterPlatform" class="input-field">
+                        <option value="">全部平台</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-dark-text mb-1">筛选药剂型号</label>
+                    <select id="filterModel" class="input-field">
+                        <option value="">全部型号</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-dark-text mb-1">筛选预算项目</label>
+                    <select id="filterBudget" class="input-field">
+                        <option value="">全部项目</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-sm font-medium text-dark-text mb-1">最小罐数</label>
+                        <input type="number" id="minCan" placeholder="最小罐数" min="1" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-dark-text mb-1">最大罐数</label>
+                        <input type="number" id="maxCan" placeholder="最大罐数" min="1" class="input-field">
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3 mt-4">
+                <button class="btn btn-primary btn-animated" id="doFilter">
+                    <i class="fa fa-filter"></i>
+                    执行筛选
+                </button>
+                <button class="btn btn-outline btn-animated" id="resetFilter">
+                    <i class="fa fa-refresh"></i>
+                    重置筛选
+                </button>
+            </div>
+        </div>
+        
+        <!-- 原有出运需求表格 -->
+        <div class="card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold card-title">
+                    <i class="fa fa-table"></i>
+                    5. 出运需求表
+                </h3>
+                <div class="flex items-center gap-2">
+                    <div class="text-sm text-dark-text-secondary">
+                        共 <span id="totalRecords" class="font-medium text-primary">0</span> 条记录
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="demandTable" class="w-full text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-3 py-2 text-left">序号</th>
+                            <th class="px-3 py-2 text-left">船期日期</th>
+                            <th class="px-3 py-2 text-left">要料单位</th>
+                            <th class="px-3 py-2 text-left">经营项目预算名称</th>
+                            <th class="px-3 py-2 text-left">合同/订单号</th>
+                            <th class="px-3 py-2 text-left">作业区</th>
+                            <th class="px-3 py-2 text-left">送货设施</th>
+                            <th class="px-3 py-2 text-left">产品名称</th>
+                            <th class="px-3 py-2 text-left">型号</th>
+                            <th class="px-3 py-2 text-right">出运包装量(罐)</th>
+                            <th class="px-3 py-2 text-left">包装形式</th>
+                            <th class="px-3 py-2 text-left">备注</th>
+                            <th class="px-3 py-2 text-left">订单有效期</th>
+                            <th class="px-3 py-2 text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="14" class="px-3 py-8 text-center text-dark-text-secondary">
+                                <div class="flex flex-col items-center">
+                                    <i class="fa fa-file-text-o text-3xl text-dark-border mb-2"></i>
+                                    <p>暂无符合条件的数据，请先上传文件并生成出运需求表</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页控件 -->
+            <div class="flex items-center justify-between mt-4" id="pagination" style="display: none;">
+                <div class="text-sm text-dark-text-secondary">
+                    显示 <span id="startRecord">1</span> 到 <span id="endRecord">30</span> 条，共 <span id="totalRecordCount">0</span> 条
+                </div>
+                <div class="flex items-center gap-1">
+                    <button class="page-btn" id="firstPage">
+                        <i class="fa fa-angle-double-left"></i>
+                    </button>
+                    <button class="page-btn" id="prevPage">
+                        <i class="fa fa-angle-left"></i>
+                    </button>
+                    <div class="flex items-center" id="pageNumbers">
+                        <!-- 页码按钮将通过JS动态生成 -->
+                    </div>
+                    <button class="page-btn" id="nextPage">
+                        <i class="fa fa-angle-right"></i>
+                    </button>
+                    <button class="page-btn" id="lastPage">
+                        <i class="fa fa-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark-card border-t border-dark-border mt-8 py-4">
+        <div class="container mx-auto px-4 text-center text-sm text-dark-text-secondary">
+            <p>© 2025 油田化学番禺流花药剂出运需求与订单管理系统 | 版本 2.0.0</p>
+        </div>
+    </footer>
+    
+    <!-- 编辑罐数模态框 -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-dark-card rounded-lg shadow-lg w-full max-w-md p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-dark-text">编辑出运包装量</h3>
+                <button id="closeModal" class="text-dark-text-secondary hover:text-dark-text">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <p class="text-sm text-dark-text-secondary mb-2" id="editModalTitle">编辑【产品名称-型号】的出运包装量(罐)</p>
+                <div class="flex items-center gap-2">
+                    <input type="number" id="editCanInput" min="1" class="input-field" placeholder="请输入罐数">
+                    <span class="text-sm text-dark-text-secondary">罐</span>
+                </div>
+                <p class="text-xs text-dark-text-secondary mt-1" id="editModalHint">订单最大可出：0罐</p>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button id="cancelEdit" class="btn btn-outline btn-animated">取消</button>
+                <button id="confirmEdit" class="btn btn-primary btn-animated">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 操作结果提示 -->
+    <div id="toast" class="fixed top-4 right-4 bg-dark-card shadow-lg rounded-md p-4 flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-50 max-w-sm border border-dark-border">
+        <div id="toastIcon" class="w-8 h-8 rounded-full flex items-center justify-center">
+            <!-- 图标将通过JS动态设置 -->
+        </div>
+        <div>
+            <h4 id="toastTitle" class="font-medium text-dark-text">操作成功</h4>
+            <p id="toastMessage" class="text-sm text-dark-text-secondary">操作已完成</p>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let dailyReportData = [], materialCodeData = [], orderData = [], demandData = [], originDemandData = [], tankDynamicData = [];
+        let consumableData = [], consumableHistory = [];
+        let shipmentData = [], attenuateLogData = [], updatedOrderData = [], matchComparisonData = [];
+        let lowStockData = [];
+        const stockDaysMap = new Map();
+        const orderExpireMap = new Map();
+        const expireLeftDaysMap = new Map();
+        const tankAllocateMap = new Map();
+        const originMaxCanMap = new Map();
+        const overOrderMap = new Map();
+        const 单罐升数 = 2000;
+        const 普通包装形式 = '2000L/罐';
+        const 实验室耗材包装形式 = 'EA';
+        const 实验耗材预算项目列表 = ['45、实验室耗材'];
+        const 要料单位 = "南海东部番禺流花";
+        const ENABLE_PACKAGE_BACKUP = false;
+        const WARN_DAYS = 7;
+        
+        // 当前编辑的行索引
+        let currentEditIndex = -1;
+        
+        // 分页相关变量
+        let currentPage = 1;
+        const pageSize = 30; // 修改为每页30条记录
+        let filteredData = [];
+        
+        // 图表实例
+        let orderStatusChart, demandTrendChart, attenuateStatsChart;
+        
+        // ====================== 工具函数 ======================
+        
+        // 日期格式化函数
+        function formatDateToString(dateVal) {
+            if (!dateVal) return '';
+            
+            if (typeof dateVal === 'string') {
+                const date = new Date(dateVal);
+                if (isNaN(date.getTime())) return dateVal;
+                return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,0)}-${date.getDate().toString().padStart(2,0)}`;
+            }
+            
+            if (typeof dateVal === 'number') {
+                const jsDate = excelDateToJsDate(dateVal);
+                if (!jsDate) return '';
+                return `${jsDate.getFullYear()}-${(jsDate.getMonth()+1).toString().padStart(2,0)}-${jsDate.getDate().toString().padStart(2,0)}`;
+            }
+            
+            if (dateVal instanceof Date) {
+                if (isNaN(dateVal.getTime())) return '';
+                return `${dateVal.getFullYear()}-${(dateVal.getMonth()+1).toString().padStart(2,0)}-${dateVal.getDate().toString().padStart(2,0)}`;
+            }
+            
+            return String(dateVal);
+        }
+        
+        // 文件记忆功能
+        function saveFileToMemory(file, key, memoId) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const fileObj = { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified, data: e.target.result };
+                localStorage.setItem(key, JSON.stringify(fileObj));
+                document.getElementById(memoId).textContent = `✅ 已记忆：${file.name}`;
+                showToast('success', '文件已保存', `已成功保存文件：${file.name}`);
+            };
+        }
+        
+        function loadFileFromMemory(key, fileId, memoId) {
+            const fileStr = localStorage.getItem(key);
+            if (!fileStr) return null;
+            try {
+                const fileObj = JSON.parse(fileStr);
+                const byteString = atob(fileObj.data.split(',')[1]);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                const file = new File([ab], fileObj.name, { type: fileObj.type });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById(fileId).files = dataTransfer.files;
+                document.getElementById(memoId).textContent = `✅ 已记忆：${file.name}`;
+                return file;
+            } catch (e) { 
+                localStorage.removeItem(key); 
+                return null; 
+            }
+        }
+        
+        function clearFileCache(key, memoId) { 
+            localStorage.removeItem(key); 
+            document.getElementById(memoId).textContent = ''; 
+        }
+        
+        function clearAllFileMemory() {
+            if(confirm('确定要清除所有文件记忆吗？清除后下次需要重新上传！')){
+                clearFileCache('dailyReportCache', 'dailyMemo');
+                clearFileCache('materialCodeCache', 'materialMemo');
+                clearFileCache('orderCache', 'orderMemo');
+                clearFileCache('tankDynamicCache', 'tankMemo');
+                clearFileCache('shipmentCache', 'shipmentMemo');
+                document.getElementById('dailyReportFile').value = '';
+                document.getElementById('materialCodeFile').value = '';
+                document.getElementById('orderFile').value = '';
+                document.getElementById('tankDynamicFile').value = '';
+                document.getElementById('shipmentFile').value = '';
+                showToast('success', '清除成功', '已清空所有文件记忆！');
+            }
+        }
+        
+        // 日期处理
+        function formatShipDate(dateVal) {
+            if (!dateVal) return '';
+            const date = new Date(dateVal);
+            return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,0)}-${date.getDate().toString().padStart(2,0)}`;
+        }
+        
+        function excelDateToJsDate(excelDate) {
+            if (!excelDate || excelDate === '' || excelDate === null) return null;
+            if (typeof excelDate === 'string') {
+                const pureDate = excelDate.trim();
+                if(!pureDate) return null;
+                const date = new Date(pureDate);
+                return isNaN(date.getTime()) ? null : date;
+            }
+            const baseDate = new Date(1899, 11, 30);
+            const jsDate = new Date(baseDate.getTime() + excelDate * 24 * 60 * 60 * 1000);
+            return isNaN(jsDate.getTime()) ? null : jsDate;
+        }
+        
+        function getOrderExpireLeftDays(orderDateStr, deliveryDateStr, shipDateStr) {
+            if(!orderDateStr || !deliveryDateStr || !shipDateStr) return null;
+            const orderDate = excelDateToJsDate(orderDateStr);
+            const deliveryDate = excelDateToJsDate(deliveryDateStr);
+            const shipDate = excelDateToJsDate(shipDateStr);
+            if(!orderDate || !deliveryDate || !shipDate || isNaN(orderDate.getTime()) || isNaN(deliveryDate.getTime()) || isNaN(shipDate.getTime())) return null;
+            const timeDiff = deliveryDate.getTime() - shipDate.getTime();
+            const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+            return dayDiff;
+        }
+        
+        // Excel读取
+        async function readExcelFile(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    resolve(jsonData);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        // 罐号分配
+        function initTankPool() {
+            tankAllocateMap.clear();
+            if (!tankDynamicData.length) return;
+            const tankGroupMap = new Map();
+            tankDynamicData.forEach(item => {
+                const tankName = item['变更后药剂名称'] || item['药剂名称'] || '';
+                const tankNo = item['罐号'] || item['目前罐号'] || '';
+                const tankStatus = item['存储状态'] || '';
+                if (!tankName || !tankNo || !['满','领用'].includes(tankStatus)) return;
+                
+                const key = tankName;
+                if (!tankGroupMap.has(key)) {
+                    tankGroupMap.set(key, { full: [], use: [] });
+                }
+                const group = tankGroupMap.get(key);
+                if(tankStatus === '满' && !group.full.includes(tankNo)) group.full.push(tankNo);
+                if(tankStatus === '领用' && !group.use.includes(tankNo)) group.use.push(tankNo);
+            });
+            
+            tankGroupMap.forEach((val, key) => {
+                const fullTanks = val.full.sort().join('/');
+                const useTanks = val.use.sort().join('/');
+                let tankText = '';
+                if(fullTanks && useTanks) tankText = `满罐:${fullTanks} / 领用:${useTanks}`;
+                else if(fullTanks) tankText = `满罐:${fullTanks}`;
+                else if(useTanks) tankText = `领用:${useTanks}`;
+                else tankText = '无匹配罐号';
+                tankAllocateMap.set(key, { tankText, index: 0 });
+            });
+        }
+        
+        function getAllocateTankNo(medicineName) {
+            if (!tankAllocateMap.has(medicineName)) return '无匹配罐号';
+            const tankObj = tankAllocateMap.get(medicineName);
+            const tankText = tankObj.tankText;
+            tankObj.index += 1;
+            tankAllocateMap.set(medicineName, tankObj);
+            return tankText;
+        }
+        
+        // 筛选初始化
+        function initFilterSelect() {
+            const platformSet = new Set(demandData.map(item => item.送货设施));
+            const modelSet = new Set(demandData.map(item => item.型号));
+            const budgetSet = new Set(demandData.map(item => item.经营项目预算名称));
+            const platformSel = document.getElementById('filterPlatform');
+            const modelSel = document.getElementById('filterModel');
+            const budgetSel = document.getElementById('filterBudget');
+            platformSel.innerHTML = '<option value="">全部平台</option>';
+            modelSel.innerHTML = '<option value="">全部型号</option>';
+            budgetSel.innerHTML = '<option value="">全部项目</option>';
+            
+            Array.from(platformSet).forEach(p => platformSel.add(new Option(p, p)));
+            Array.from(modelSet).forEach(m => modelSel.add(new Option(m, m)));
+            Array.from(budgetSet).forEach(b => budgetSel.add(new Option(b, b)));
+            
+            document.getElementById('filterBox').style.display = 'block';
+        }
+        
+        // 保存备注 - 增加红框编辑效果
+        function saveRemarkBySerial(serial, content, element) {
+            // 移除红框编辑效果
+            element.classList.remove('red-box-editing');
+            
+            const index = originDemandData.findIndex(item => item.序号 === serial);
+            if(index > -1) {
+                originDemandData[index].备注 = content.trim();
+                showToast('success', '保存成功', '备注已更新');
+            }
+        }
+        
+        // 开始编辑备注 - 增加红框编辑效果
+        function startEditRemark(element) {
+            // 移除其他元素的红框编辑效果
+            document.querySelectorAll('.red-box-editing').forEach(el => {
+                if (el !== element) {
+                    el.classList.remove('red-box-editing');
+                }
+            });
+            
+            // 为当前元素添加红框编辑效果
+            element.classList.add('red-box-editing');
+        }
+        
+        // 编辑行
+        function editRowBySerial(serial) {
+            const index = originDemandData.findIndex(item => item.序号 === serial);
+            if(index > -1) {
+                currentEditIndex = index;
+                showEditModal(index);
+            }
+        }
+        
+        // 复制行
+        function copyRowBySerial(serial) {
+            const index = originDemandData.findIndex(item => item.序号 === serial);
+            if(index > -1) {
+                const originalItem = originDemandData[index];
+                const copiedItem = JSON.parse(JSON.stringify(originalItem));
+                
+                // 生成新的序号
+                const newSerial = Math.max(...originDemandData.map(item => item.序号)) + 1;
+                copiedItem.序号 = newSerial;
+                
+                // 添加复制标识到备注
+                if (copiedItem.备注) {
+                    copiedItem.备注 = `[复制] ${copiedItem.备注}`;
+                } else {
+                    copiedItem.备注 = '[复制]';
+                }
+                
+                // 复制相关的映射数据
+                const originalDataIndex = originalItem.序号 - 1;
+                const newDataIndex = newSerial - 1;
+                
+                if (stockDaysMap.has(originalDataIndex)) {
+                    stockDaysMap.set(newDataIndex, stockDaysMap.get(originalDataIndex));
+                }
+                if (orderExpireMap.has(originalDataIndex)) {
+                    orderExpireMap.set(newDataIndex, orderExpireMap.get(originalDataIndex));
+                }
+                if (expireLeftDaysMap.has(originalDataIndex)) {
+                    expireLeftDaysMap.set(newDataIndex, expireLeftDaysMap.get(originalDataIndex));
+                }
+                if (originMaxCanMap.has(originalDataIndex)) {
+                    originMaxCanMap.set(newDataIndex, originMaxCanMap.get(originalDataIndex));
+                }
+                if (overOrderMap.has(originalDataIndex)) {
+                    overOrderMap.set(newDataIndex, overOrderMap.get(originalDataIndex));
+                }
+                
+                // 插入到原行后面
+                originDemandData.splice(index + 1, 0, copiedItem);
+                
+                // 重新渲染表格
+                resetFilterTable();
+                showToast('success', '复制成功', '已复制选中的出运需求数据');
+                updateDashboardStats();
+            }
+        }
+
+        // 删除行
+        function deleteRowBySerial(serial) {
+            const index = originDemandData.findIndex(item => item.序号 === serial);
+            if(index > -1) {
+                if(confirm('确定要删除这条出运需求数据吗？删除后不可恢复！')){
+                    const delIndex = originDemandData[index].序号 - 1;
+                    stockDaysMap.delete(delIndex);
+                    orderExpireMap.delete(delIndex);
+                    expireLeftDaysMap.delete(delIndex);
+                    originMaxCanMap.delete(delIndex);
+                    overOrderMap.delete(delIndex);
+                    originDemandData.splice(index, 1);
+                    originDemandData.forEach((item, i) => { item.序号 = i + 1; });
+                    resetFilterTable();
+                    showToast('success', '删除成功', '已删除选中的出运需求数据');
+                    updateDashboardStats();
+                }
+            }
+        }
+        
+        // 执行筛选
+        function doFilterTable() {
+            const platformVal = document.getElementById('filterPlatform').value;
+            const modelVal = document.getElementById('filterModel').value;
+            const budgetVal = document.getElementById('filterBudget').value;
+            const minCan = parseInt(document.getElementById('minCan').value) || 1;
+            const maxCan = parseInt(document.getElementById('maxCan').value) || 999999;
+            
+            filteredData = [...originDemandData];
+            
+            if(platformVal) filteredData = filteredData.filter(item => item.送货设施 === platformVal);
+            if(modelVal) filteredData = filteredData.filter(item => item.型号 === modelVal);
+            if(budgetVal) filteredData = filteredData.filter(item => item.经营项目预算名称 === budgetVal);
+            filteredData = filteredData.filter(item => item.出运包装量 >= minCan && item.出运包装量 <= maxCan);
+            
+            currentPage = 1;
+            renderPagination();
+            renderTable();
+            
+            document.getElementById('totalRecords').textContent = filteredData.length;
+        }
+        
+        // 重置筛选
+        function resetFilterTable() {
+            document.getElementById('filterPlatform').value = '';
+            document.getElementById('filterModel').value = '';
+            document.getElementById('filterBudget').value = '';
+            document.getElementById('minCan').value = '';
+            document.getElementById('maxCan').value = '';
+            
+            filteredData = [...originDemandData];
+            currentPage = 1;
+            renderPagination();
+            renderTable();
+            
+            document.getElementById('totalRecords').textContent = filteredData.length;
+        }
+        
+        // 生成出运需求表
+        async function generateDemandTable() {
+            const dailyReportFile = document.getElementById('dailyReportFile').files[0];
+            const materialCodeFile = document.getElementById('materialCodeFile').files[0];
+            const orderFile = document.getElementById('orderFile').files[0];
+            const tankDynamicFile = document.getElementById('tankDynamicFile').files[0];
+            const shipDateVal = document.getElementById('shipDateSet').value;
+            
+            if (!dailyReportFile || !materialCodeFile || !orderFile || !tankDynamicFile) { 
+                showToast('error', '缺少文件', '请上传全部四个Excel文件（日报表+物料编码+订单余量+罐动态表）！');
+                return; 
+            }
+            if (!shipDateVal) { 
+                showToast('error', '缺少日期', '请选择船期日期！无船期日期无法计算订单剩余天数！');
+                return; 
+            }
+            
+            const finalShipDate = formatShipDate(shipDateVal);
+            
+            // 显示加载状态
+            showLoading('正在处理数据，请稍候...');
+            
+            try {
+                dailyReportData = await readExcelFile(dailyReportFile);
+                materialCodeData = await readExcelFile(materialCodeFile);
+                orderData = await readExcelFile(orderFile);
+                tankDynamicData = await readExcelFile(tankDynamicFile);
+                
+                // 格式化订单数据中的日期字段
+                orderData = orderData.map(item => {
+                    return {
+                        ...item,
+                        '订单日期': formatDateToString(item['订单日期'] || item['下单日期']),
+                        '交货日期': formatDateToString(item['交货日期'] || item['交付日期'] || item['到期日期'])
+                    };
+                });
+                
+                orderData.sort((a, b) => {
+                    const aDate = new Date(a['订单日期']);
+                    const bDate = new Date(b['订单日期']);
+                    if(isNaN(aDate.getTime()) && isNaN(bDate.getTime())) return 0;
+                    if(isNaN(aDate.getTime())) return 1;
+                    if(isNaN(bDate.getTime())) return -1;
+                    return aDate - bDate;
+                });
+                
+                initTankPool();
+                
+                demandData = [];
+                stockDaysMap.clear();
+                orderExpireMap.clear();
+                expireLeftDaysMap.clear();
+                originMaxCanMap.clear();
+                overOrderMap.clear();
+                let serialNumber = 1;
+                
+                for (const dailyItem of dailyReportData) {
+                    const 油田 = dailyItem['油田'] || '';
+                    const 平台 = dailyItem['平台'] || dailyItem['设施'] || '';
+                    const 药剂名称 = dailyItem['药剂名称'] || dailyItem['产品名称'] || '';
+                    const 药剂型号 = dailyItem['药剂型号'] || dailyItem['型号'] || '';
+                    const 日消耗量 = Number(dailyItem['日消耗量'] || dailyItem['日消耗量（L）'] || 0);
+                    const 现场库存量 = Number(dailyItem['现场库存量'] || 0);
+                    const 库存天数 = Number(dailyItem['库存天数'] || 0);
+                    const 完整药剂名 = `${药剂名称}${药剂型号}`;
+                    
+                    if (!药剂名称 || !药剂型号 || 日消耗量 <= 0) continue;
+                    const needVolume = 日消耗量 * (30 - 库存天数);
+                    let 剩余需求罐数 = Math.ceil(needVolume / 单罐升数);
+                    let 剩余需求升数 = 剩余需求罐数 * 单罐升数;
+                    if (剩余需求罐数 <= 0) continue;
+                    
+                    const materialItem = materialCodeData.find(item => (item['药剂型号'] === 药剂型号) && (item['药剂名称'] === 药剂名称));
+                    const 经营项目预算名称 = materialItem ? materialItem['预算项目'] : '总包药剂';
+                    const 物料编码 = materialItem ? (materialItem['物料编码'] || '') : '';
+                    
+                    // 判断是否为实验室耗材，自动选择包装形式
+                    const isExperimentMaterial = 实验耗材预算项目列表.includes(经营项目预算名称);
+                    const 最终包装形式 = isExperimentMaterial ? 实验室耗材包装形式 : 普通包装形式;
+                    
+                    const 匹配的可用订单列表 = orderData.filter(item => 
+                        (item['药剂名称'] === 药剂名称) && (item['药剂型号'] === 药剂型号) && 
+                        (item['设施'] === 平台 || item['使用平台'] === 平台 || item['送货设施'] === 平台 || item['对应平台'] === 平台) &&
+                        Number(item['剩余数量'] || 0) > 0
+                    );
+                    
+                    let hasOrderInfo = false;
+                    if (匹配的可用订单列表.length > 0) {
+                        for (const orderItem of 匹配的可用订单列表) {
+                            const 订单剩余数量 = Math.max(0, Number(orderItem['剩余数量'] || 0));
+                            if (订单剩余数量 <= 0) continue;
+                            
+                            // 实验室耗材特殊处理：直接使用订单剩余数量，不进行罐数转换
+                            let 本次扣减数量, 订单最大可出数量, 剩余需求;
+                            if (isExperimentMaterial) {
+                                // 实验室耗材：直接使用EA单位，不进行罐数转换
+                                本次扣减数量 = 订单剩余数量; // 实验室耗材使用实际订单剩余数量
+                                订单最大可出数量 = Math.floor(订单剩余数量);
+                            } else {
+                                // 普通药剂：按罐计算
+                                const 本次扣减升数 = Math.min(订单剩余数量, 剩余需求升数);
+                                本次扣减数量 = Math.floor(本次扣减升数 / 单罐升数);
+                                订单最大可出数量 = Math.floor(订单剩余数量 / 单罐升数);
+                            }
+                            
+                            if (本次扣减数量 <= 0) continue;
+                            
+                            const orderDate = orderItem['订单日期'] || '';
+                            const deliveryDate = orderItem['交货日期'] || '';
+                            const orderNo = orderItem['订单号'] || '';
+                            const projectNo = orderItem['项目号'] || '';
+                            
+                            hasOrderInfo = (orderNo !== '' || projectNo !== '' || 物料编码 !== '');
+                            let 合同或订单号 = '';
+                            if(hasOrderInfo){
+                                合同或订单号 = `订单：${orderNo || '无'} 项目号:${projectNo || '无'} 物资编码:${物料编码 || '无'}`;
+                            }else{
+                                合同或订单号 = '总包药剂';
+                            }
+                            const 自动罐号备注 = getAllocateTankNo(完整药剂名);
+                            
+                            const demandItem = {
+                                序号: serialNumber++,
+                                船期日期: finalShipDate,
+                                要料单位: 要料单位,
+                                经营项目预算名称: 经营项目预算名称,
+                                合同或订单号: 合同或订单号,
+                                送货设施: 平台,
+                                产品名称: 药剂名称,
+                                型号: 药剂型号,
+                                出运包装量: 本次扣减数量,
+                                包装形式: 最终包装形式,
+                                备注: 自动罐号备注,
+                                订单剩余数量: 订单剩余数量 // 为实验室耗材保存订单剩余数量
+                            };
+                            demandData.push(demandItem);
+                            stockDaysMap.set(demandItem.序号 - 1, 库存天数);
+                            const leftDays = getOrderExpireLeftDays(orderDate, deliveryDate, finalShipDate);
+                            expireLeftDaysMap.set(demandItem.序号 - 1, leftDays);
+                            orderExpireMap.set(demandItem.序号 - 1, leftDays !== null && leftDays < 0);
+                            originMaxCanMap.set(demandItem.序号 -1, 订单最大可出数量);
+                            overOrderMap.set(demandItem.序号 -1, false);
+                            
+                            // 更新订单剩余数量
+                            if (isExperimentMaterial) {
+                                orderItem['剩余数量'] = Math.max(0, 订单剩余数量 - 本次扣减数量);
+                            } else {
+                                orderItem['剩余数量'] = Math.max(0, 订单剩余数量 - 本次扣减数量 * 单罐升数);
+                                剩余需求升数 -= 本次扣减数量 * 单罐升数;
+                                剩余需求罐数 = Math.ceil(剩余需求升数 / 单罐升数);
+                                if (剩余需求升数 <= 0) break;
+                            }
+                        }
+                    }
+                    
+                    if (剩余需求罐数 > 0) {
+                        // 查找匹配的订单信息以获取订单号和项目号
+                        const matchingOrder = orderData.find(item => 
+                            (item['药剂名称'] === 药剂名称) && (item['药剂型号'] === 药剂型号) && 
+                            (item['设施'] === 平台 || item['使用平台'] === 平台 || item['送货设施'] === 平台 || item['对应平台'] === 平台)
+                        );
+                        
+                        const orderNo = matchingOrder ? (matchingOrder['订单号'] || '') : '';
+                        const projectNo = matchingOrder ? (matchingOrder['项目号'] || '') : '';
+                        
+                        hasOrderInfo = (物料编码 !== '') || (orderNo !== '') || (projectNo !== '');
+                        let 合同或订单号 = hasOrderInfo ? `订单：${orderNo || '无'} 项目号:${projectNo || '无'} 物资编码:${物料编码 || '无'}` : '总包药剂';
+                        if(经营项目预算名称 === '总包药剂'){
+                            合同或订单号 = '总包药剂';
+                        }
+                        const 自动罐号备注 = getAllocateTankNo(完整药剂名);
+                        
+                        const demandItem = {
+                            序号: serialNumber++,
+                            船期日期: finalShipDate,
+                            要料单位: 要料单位,
+                            经营项目预算名称: 经营项目预算名称,
+                            合同或订单号: 合同或订单号,
+                            送货设施: 平台,
+                            产品名称: 药剂名称,
+                            型号: 药剂型号,
+                            出运包装量: 剩余需求罐数,
+                            包装形式: 最终包装形式,
+                            备注: 自动罐号备注,
+                            订单剩余数量: 0 // 无订单时设为0
+                        };
+                        demandData.push(demandItem);
+                        stockDaysMap.set(demandItem.序号 - 1, 库存天数);
+                        expireLeftDaysMap.set(demandItem.序号 - 1, null);
+                        orderExpireMap.set(demandItem.序号 - 1, false);
+                        originMaxCanMap.set(demandItem.序号 -1, 999999);
+                        overOrderMap.set(demandItem.序号 -1, false);
+                    }
+                }
+                
+                originDemandData = [...demandData];
+                filteredData = [...originDemandData];
+                currentPage = 1;
+                
+                initFilterSelect();
+                renderPagination();
+                renderTable();
+                updateDashboardStats();
+                initCharts();
+                
+                document.getElementById('totalRecords').textContent = filteredData.length;
+                
+                // 生成低于15日库存的数据表
+                generateLowStockData();
+                
+                // 更新趋势图表
+                updateTrendChart('all');
+                
+                hideLoading();
+                
+                const expiredCount = Array.from(orderExpireMap.values()).filter(v => v).length;
+                const warnCount = Array.from(expireLeftDaysMap.values()).filter(v => v!==null && v >=0 && v <= WARN_DAYS).length;
+                const overOrderCount = Array.from(overOrderMap.values()).filter(v => v).length;
+                const experimentCount = originDemandData.filter(item => 实验耗材预算项目列表.includes(item.经营项目预算名称)).length;
+                
+                if(demandData.length > 0){
+                    showToast('success', '生成成功', `已成功生成 ${demandData.length} 条出运需求数据`);
+                }else{
+                    showToast('info', '无数据', '暂无符合条件的出运需求数据');
+                }
+            } catch (error) {
+                hideLoading();
+                showToast('error', '生成失败', `生成出运需求表时发生错误：${error.message}`);
+                console.error('生成出运需求表错误:', error);
+            }
+        }
+        
+        // 导出Excel
+        function exportExcel() {
+            if (originDemandData.length === 0) { 
+                showToast('error', '导出失败', '暂无数据可导出，请先生成出运需求表！');
+                return; 
+            }
+            
+            const exportData = originDemandData.map((item,index)=>{
+                const leftDays = expireLeftDaysMap.get(item.序号 -1);
+                const isExpired = orderExpireMap.get(item.序号 -1);
+                const isOverOrder = overOrderMap.get(item.序号 -1) || false;
+                const maxCan = originMaxCanMap.get(item.序号 -1) || 0;
+                let daysText = '';
+                
+                // 根据经营项目预算名称自动识别作业区
+                const 经营项目预算名称 = item.经营项目预算名称 || '';
+                const 送货设施 = item.送货设施 || '';
+                let 作业区 = '';
+                
+                // 检查是否为实验耗材
+                const isExperimentMaterial = 实验耗材预算项目列表.includes(经营项目预算名称);
+                
+                if (isExperimentMaterial) {
+                    // 实验耗材根据设施平台区分作业区
+                    if (送货设施.includes('番禺') || 送货设施.includes('PY')) {
+                        作业区 = '番禺';
+                    } else if (送货设施.includes('流花') || 送货设施.includes('LH') || 送货设施.includes('HYSY122')) {
+                        作业区 = '流花';
+                    } else {
+                        作业区 = '其他';
+                    }
+                } else {
+                    // 非实验耗材根据经营项目预算名称区分作业区
+                    if (经营项目预算名称.includes('番禺')) {
+                        作业区 = '番禺';
+                    } else if (经营项目预算名称.includes('流花')) {
+                        作业区 = '流花';
+                    } else {
+                        作业区 = '其他';
+                    }
+                }
+                
+                if(isOverOrder){
+                    daysText = `⚠️超订单【最大可出${maxCan}罐】`;
+                }else if(leftDays === null || item.合同或订单号 === '总包药剂'){
+                    daysText = '无订单';
+                }else if(isExpired){
+                    daysText = `已超期${Math.abs(leftDays)}天`;
+                }else{
+                    daysText = `剩余${leftDays}天`;
+                }
+                return {
+                    ...item,
+                    '订单有效期': daysText,
+                    '船期日期': formatDateToString(item.船期日期),
+                    '作业区': 作业区
+                };
+            });
+            
+            // 创建工作簿
+            const workbook = XLSX.utils.book_new();
+            
+            // 创建包含表头的数组
+            const headerData = [
+                ['出运需求表'],
+                [''] // 第二行空行
+            ];
+            
+            // 将数据添加到表头后面
+            const finalData = headerData.concat(exportData.map(item => [
+                item.序号,
+                item.船期日期,
+                item.要料单位,
+                item.经营项目预算名称,
+                item.合同或订单号,
+                item.作业区,
+                item.送货设施,
+                item.产品名称,
+                item.型号,
+                item.出运包装量,
+                item.包装形式,
+                item.备注,
+                item.订单有效期
+            ]));
+            
+            // 添加列标题
+            finalData.splice(2, 0, [
+                '序号', '船期日期', '要料单位', '经营项目预算名称', 
+                '合同/订单号', '作业区', '送货设施', '产品名称', '型号', 
+                '出运包装量(罐)', '包装形式', '备注', '订单有效期'
+            ]);
+            
+            // 创建工作表
+            const worksheet = XLSX.utils.aoa_to_sheet(finalData);
+            
+            // 设置列宽
+            const colWidths = [
+                { wch: 8 },   // 序号
+                { wch: 12 },  // 船期日期
+                { wch: 15 },  // 要料单位
+                { wch: 20 },  // 经营项目预算名称
+                { wch: 30 },  // 合同/订单号
+                { wch: 10 },  // 作业区
+                { wch: 12 },  // 送货设施
+                { wch: 15 },  // 产品名称
+                { wch: 12 },  // 型号
+                { wch: 15 },  // 出运包装量(罐)
+                { wch: 12 },  // 包装形式
+                { wch: 25 },  // 备注
+                { wch: 15 }   // 订单有效期
+            ];
+            worksheet['!cols'] = colWidths;
+            
+            // 设置合并单元格
+            worksheet['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 11 } } // 合并第一行所有列
+            ];
+            
+            // 创建样式
+            const headerStyle = {
+                font: { bold: true, size: 14 },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: {
+                    type: 'pattern',
+                    patternType: 'solid',
+                    fgColor: { rgb: '4F81BD' }
+                },
+                font: {
+                    bold: true,
+                    color: { rgb: 'FFFFFF' }
+                }
+            };
+            
+            const titleStyle = {
+                font: { bold: true, size: 16 },
+                alignment: { horizontal: 'center', vertical: 'center' }
+            };
+            
+            const columnHeaderStyle = {
+                font: { bold: true },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: {
+                    type: 'pattern',
+                    patternType: 'solid',
+                    fgColor: { rgb: 'DDEBF7' }
+                }
+            };
+            
+            // 应用样式（注意：基本的SheetJS不支持直接样式应用，这里只是设置格式）
+            // 在实际使用中，可能需要使用xlsx-style或类似的扩展库
+            
+            // 添加工作表到工作簿
+            XLSX.utils.book_append_sheet(workbook, worksheet, "出运需求表");
+            
+            // 生成文件名
+            const now = new Date();
+            const formatDate = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,0)}${now.getDate().toString().padStart(2,0)}-${now.getHours().toString().padStart(2,0)}${now.getMinutes().toString().padStart(2,0)}${now.getSeconds().toString().padStart(2,0)}`;
+            
+            // 导出文件
+            XLSX.writeFile(workbook, `出运需求表_${formatDate}.xlsx`);
+            
+            showToast('success', '导出成功', '出运需求表已成功导出');
+        }
+        
+        // 处理PO号科学计数法
+        function formatPOCode(poCode) {
+            if (!poCode || poCode === '') return '';
+            if (typeof poCode === 'number') {
+                if (poCode.toString().includes('e+')) {
+                    return poCode.toFixed(0);
+                }
+                return poCode.toString().trim();
+            }
+            return poCode.toString().trim();
+        }
+        
+        // 执行订单剩余量衰减
+        async function executeOrderAttenuation() {
+            const shipmentFile = document.getElementById('shipmentFile').files[0];
+            const orderFile = document.getElementById('orderFile').files[0];
+            
+            if (!shipmentFile || !orderFile) {
+                showToast('error', '缺少文件', '请先上传「发货记录表」和「订单余量数据表」！');
+                return;
+            }
+            
+            // 显示加载状态
+            showLoading('正在执行订单剩余量衰减，请稍候...');
+            
+            try {
+                shipmentData = await readExcelFile(shipmentFile);
+                const originalOrderData = await readExcelFile(orderFile);
+                
+                // 格式化订单数据中的所有日期字段
+                updatedOrderData = JSON.parse(JSON.stringify(originalOrderData)).map(item => {
+                    const formattedItem = { ...item };
+                    // 格式化所有常见的日期字段
+                    if (item['订单日期']) formattedItem['订单日期'] = formatDateToString(item['订单日期']);
+                    if (item['下单日期']) formattedItem['下单日期'] = formatDateToString(item['下单日期']);
+                    if (item['交货日期']) formattedItem['交货日期'] = formatDateToString(item['交货日期']);
+                    if (item['交付日期']) formattedItem['交付日期'] = formatDateToString(item['交付日期']);
+                    if (item['到期日期']) formattedItem['到期日期'] = formatDateToString(item['到期日期']);
+                    if (item['发货日期']) formattedItem['发货日期'] = formatDateToString(item['发货日期']);
+                    
+                    // 确保PO号格式化
+                    if (item['订单号']) formattedItem['订单号'] = formatPOCode(item['订单号']);
+                    if (item['PO号']) formattedItem['PO号'] = formatPOCode(item['PO号']);
+                    
+                    return formattedItem;
+                });
+                
+                attenuateLogData = [];
+                matchComparisonData = [];
+                
+                // 统计变量
+                let totalShipment = shipmentData.length;
+                let matchedCount = 0;
+                let attenuatedCount = 0;
+                let overShipmentCount = 0;
+                
+                // 遍历发货记录进行匹配衰减
+                shipmentData.forEach((shipmentItem, shipmentIndex) => {
+                    const shipmentId = shipmentIndex + 1;
+                    const poCode = formatPOCode(shipmentItem['PO号'] || shipmentItem['订单号'] || '');
+                    const projectCode = shipmentItem['项目号'] || '';
+                    const medicineModel = shipmentItem['药剂型号'] || shipmentItem['型号'] || '';
+                    const facility = shipmentItem['设施'] || shipmentItem['平台'] || '';
+                    const shipQuantity = Number(shipmentItem['发货数量'] || 0);
+                    const unit = shipmentItem['单位'] || 'L';
+                    
+                    // 数据校验
+                    if (!medicineModel || !facility || shipQuantity <= 0) {
+                        matchComparisonData.push({
+                            '发货记录ID': shipmentId,
+                            'PO号': poCode,
+                            '项目号': projectCode,
+                            '药剂型号': medicineModel,
+                            '设施': facility,
+                            '发货数量': shipQuantity,
+                            '单位': unit,
+                            '匹配状态': '未匹配（关键信息缺失）',
+                            '匹配订单号': '-',
+                            '衰减前剩余量': '-',
+                            '衰减后剩余量': '-'
+                        });
+                        return;
+                    }
+                    
+                    // 匹配订单（优先级：PO号+药剂型号+设施 → 项目号+药剂型号+设施）
+                    // 优化：优先匹配交货日期接近的订单
+                    let matchedOrder = null;
+                    let matchType = '';
+                    const today = new Date();
+                    
+                    // 1. PO号+药剂型号+设施匹配
+                    if (poCode) {
+                        const matchingOrders = updatedOrderData.filter(order => 
+                            formatPOCode(order['订单号'] || order['PO号']) === poCode &&
+                            (order['药剂型号'] === medicineModel) &&
+                            (order['设施'] === facility || order['使用平台'] === facility) &&
+                            Number(order['剩余数量'] || 0) > 0 &&
+                            order['订单状态'] !== '已完成'
+                        );
+                        
+                        if (matchingOrders.length > 0) {
+                            // 按交货日期接近程度排序，优先扣减交货日期最近的订单
+                            matchingOrders.sort((a, b) => {
+                                const dateA = new Date(a['交货日期'] || a['交付日期'] || a['到期日期'] || '9999-12-31');
+                                const dateB = new Date(b['交货日期'] || b['交付日期'] || b['到期日期'] || '9999-12-31');
+                                const diffA = Math.abs(dateA - today);
+                                const diffB = Math.abs(dateB - today);
+                                return diffA - diffB;
+                            });
+                            
+                            matchedOrder = matchingOrders[0];
+                            matchType = 'PO号+药剂型号+设施';
+                        }
+                    }
+                    
+                    // 2. 项目号+药剂型号+设施匹配（未找到PO号匹配时）
+                    if (!matchedOrder && projectCode) {
+                        const matchingOrders = updatedOrderData.filter(order => 
+                            (order['项目号'] === projectCode) &&
+                            (order['药剂型号'] === medicineModel) &&
+                            (order['设施'] === facility || order['使用平台'] === facility) &&
+                            Number(order['剩余数量'] || 0) > 0 &&
+                            order['订单状态'] !== '已完成'
+                        );
+                        
+                        if (matchingOrders.length > 0) {
+                            // 按交货日期接近程度排序，优先扣减交货日期最近的订单
+                            matchingOrders.sort((a, b) => {
+                                const dateA = new Date(a['交货日期'] || a['交付日期'] || a['到期日期'] || '9999-12-31');
+                                const dateB = new Date(b['交货日期'] || b['交付日期'] || b['到期日期'] || '9999-12-31');
+                                const diffA = Math.abs(dateA - today);
+                                const diffB = Math.abs(dateB - today);
+                                return diffA - diffB;
+                            });
+                            
+                            matchedOrder = matchingOrders[0];
+                            matchType = '项目号+药剂型号+设施';
+                        }
+                    }
+                    
+                    // 处理匹配结果
+                    if (matchedOrder) {
+                        matchedCount++;
+                        const orderNo = formatPOCode(matchedOrder['订单号'] || matchedOrder['PO号'] || '');
+                        const originalRemaining = Number(matchedOrder['剩余数量'] || 0);
+                        let newRemaining = originalRemaining - shipQuantity;
+                        let attenuateStatus = '正常衰减';
+                        
+                        // 处理超量发货
+                        if (newRemaining < 0) {
+                            newRemaining = 0;
+                            attenuateStatus = '超量发货（已清零）';
+                            overShipmentCount++;
+                        }
+                        
+                        // 更新订单剩余量
+                        matchedOrder['剩余数量'] = newRemaining;
+                        matchedOrder['已发货数量'] = Number(matchedOrder['已发货数量'] || 0) + shipQuantity;
+                        matchedOrder['订单状态'] = newRemaining <= 0 ? '已完成' : '正常';
+                        
+                        // 记录衰减日志
+                        const now = new Date();
+                        const operateTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,0)}-${now.getDate().toString().padStart(2,0)} ${now.getHours().toString().padStart(2,0)}:${now.getMinutes().toString().padStart(2,0)}:${now.getSeconds().toString().padStart(2,0)}`;
+                        
+                        attenuateLogData.push({
+                            '操作时间': operateTime,
+                            '发货记录ID': shipmentId,
+                            '订单号(PO)': orderNo,
+                            '项目号': projectCode,
+                            '药剂型号': medicineModel,
+                            '设施': facility,
+                            '发货数量': shipQuantity,
+                            '单位': unit,
+                            '衰减前剩余量': originalRemaining,
+                            '衰减后剩余量': newRemaining,
+                            '衰减状态': attenuateStatus,
+                            '匹配方式': matchType
+                        });
+                        
+                        // 记录匹配对照表
+                        matchComparisonData.push({
+                            '发货记录ID': shipmentId,
+                            'PO号': poCode,
+                            '项目号': projectCode,
+                            '药剂型号': medicineModel,
+                            '设施': facility,
+                            '发货数量': shipQuantity,
+                            '单位': unit,
+                            '匹配状态': '已匹配',
+                            '匹配订单号': orderNo,
+                            '匹配方式': matchType,
+                            '衰减前剩余量': originalRemaining,
+                            '衰减后剩余量': newRemaining,
+                            '衰减状态': attenuateStatus
+                        });
+                        
+                        attenuatedCount++;
+                    } else {
+                        // 未匹配记录
+                        matchComparisonData.push({
+                            '发货记录ID': shipmentId,
+                            'PO号': poCode,
+                            '项目号': projectCode,
+                            '药剂型号': medicineModel,
+                            '设施': facility,
+                            '发货数量': shipQuantity,
+                            '单位': unit,
+                            '匹配状态': '未匹配（无对应订单）',
+                            '匹配订单号': '-',
+                            '衰减前剩余量': '-',
+                            '衰减后剩余量': '-'
+                        });
+                    }
+                });
+                
+                // 统计已完成订单数
+                const completedOrderCount = updatedOrderData.filter(order => order['订单状态'] === '已完成').length;
+                
+                // 更新结果展示
+                document.getElementById('totalShipmentCount').textContent = totalShipment;
+                document.getElementById('matchedCount').textContent = matchedCount;
+                document.getElementById('attenuatedCount').textContent = attenuatedCount;
+                document.getElementById('overShipmentCount').textContent = overShipmentCount;
+                document.getElementById('completedOrderCount').textContent = completedOrderCount;
+                document.getElementById('attenuateResultArea').style.display = 'block';
+                
+                // 渲染衰减日志表格
+                renderAttenuateLogTable();
+                
+                // 更新衰减统计图表
+                updateAttenuateStatsChart(totalShipment, matchedCount, attenuatedCount, overShipmentCount, completedOrderCount);
+                
+                // 启用下载按钮
+                document.getElementById('downloadAttenuateBtn').disabled = false;
+                
+                hideLoading();
+                
+                showToast('success', '衰减完成', `订单剩余量衰减操作已完成，成功匹配 ${matchedCount} 条记录`);
+            } catch (error) {
+                hideLoading();
+                showToast('error', '衰减失败', `执行订单剩余量衰减时发生错误：${error.message}`);
+                console.error('执行订单剩余量衰减错误:', error);
+            }
+        }
+        
+        // 渲染衰减日志表格
+        function renderAttenuateLogTable() {
+            const logBody = document.getElementById('attenuateLogBody');
+            logBody.innerHTML = '';
+            
+            if (attenuateLogData.length === 0) {
+                logBody.innerHTML = '<tr><td colspan="10" class="px-3 py-4 text-center text-dark-text-secondary">暂无衰减操作记录</td></tr>';
+                return;
+            }
+            
+            attenuateLogData.forEach(logItem => {
+                const row = logBody.insertRow();
+                // 超量发货标记
+                if (logItem['衰减状态'].includes('超量')) {
+                    row.className = 'bg-red-900/20';
+                }
+                // 已完成订单标记
+                if (logItem['衰减后剩余量'] <= 0 && !logItem['衰减状态'].includes('超量')) {
+                    row.className = 'bg-green-900/20';
+                }
+                
+                row.innerHTML = `
+                    <td class="px-3 py-2">${logItem['操作时间']}</td>
+                    <td class="px-3 py-2">${logItem['发货记录ID']}</td>
+                    <td class="px-3 py-2">${logItem['订单号(PO)'] || '-'}</td>
+                    <td class="px-3 py-2">${logItem['项目号'] || '-'}</td>
+                    <td class="px-3 py-2">${logItem['药剂型号']}</td>
+                    <td class="px-3 py-2">${logItem['设施']}</td>
+                    <td class="px-3 py-2 text-right">${logItem['发货数量']}${logItem['单位']}</td>
+                    <td class="px-3 py-2 text-right">${logItem['衰减前剩余量']}${logItem['单位']}</td>
+                    <td class="px-3 py-2 text-right">${logItem['衰减后剩余量']}${logItem['单位']}</td>
+                    <td class="px-3 py-2">
+                        <span class="badge ${logItem['衰减状态'].includes('超量') ? 'badge-danger' : logItem['衰减后剩余量'] <= 0 ? 'badge-success' : 'badge-info'}">
+                            ${logItem['衰减状态']}
+                        </span>
+                    </td>
+                `;
+            });
+        }
+        
+        // 下载衰减相关文件
+        function downloadAttenuateFiles() {
+            if (attenuateLogData.length === 0 || updatedOrderData.length === 0) {
+                showToast('error', '下载失败', '暂无衰减数据可下载，请先执行订单剩余量衰减！');
+                return;
+            }
+            
+            const now = new Date();
+            const formatDate = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,0)}${now.getDate().toString().padStart(2,0)}-${now.getHours().toString().padStart(2,0)}${now.getMinutes().toString().padStart(2,0)}${now.getSeconds().toString().padStart(2,0)}`;
+            
+            // 1. 下载更新后的订单表
+            const formattedOrderData = updatedOrderData.map(item => {
+                const formatted = { ...item };
+                // 确保数值字段是数字类型
+                if (formatted['剩余数量'] !== undefined) formatted['剩余数量'] = Number(formatted['剩余数量']);
+                if (formatted['已发货数量'] !== undefined) formatted['已发货数量'] = Number(formatted['已发货数量']);
+                return formatted;
+            });
+            
+            const orderWorkbook = XLSX.utils.book_new();
+            const orderWorksheet = XLSX.utils.json_to_sheet(formattedOrderData);
+            XLSX.utils.book_append_sheet(orderWorkbook, orderWorksheet, "更新后订单表");
+            XLSX.writeFile(orderWorkbook, `化学药剂销售订单表_更新后_${formatDate}.xlsx`);
+            
+            // 2. 下载匹配对照表
+            const comparisonWorkbook = XLSX.utils.book_new();
+            const comparisonWorksheet = XLSX.utils.json_to_sheet(matchComparisonData);
+            XLSX.utils.book_append_sheet(comparisonWorkbook, comparisonWorksheet, "发货订单匹配对照表");
+            XLSX.writeFile(comparisonWorkbook, `发货订单匹配对照表_${formatDate}.xlsx`);
+            
+            // 3. 下载操作日志
+            const logWorkbook = XLSX.utils.book_new();
+            const logWorksheet = XLSX.utils.json_to_sheet(attenuateLogData);
+            XLSX.utils.book_append_sheet(logWorkbook, logWorksheet, "订单剩余量衰减操作日志");
+            XLSX.writeFile(logWorkbook, `订单剩余量衰减操作日志_${formatDate}.xlsx`);
+            
+            showToast('success', '下载成功', '3个衰减相关文件已开始下载');
+        }
+        
+        // 生成低于15日库存的数据表
+        function generateLowStockData() {
+            lowStockData = [];
+            let serialNumber = 1;
+            
+            if (!dailyReportData.length) {
+                renderLowStockTable();
+                return;
+            }
+            
+            // 筛选库存天数小于15天的数据
+            const filteredLowStock = dailyReportData.filter(item => {
+                const stockDays = Number(item['库存天数'] || 0);
+                const dailyConsumption = Number(item['日消耗量'] || item['日消耗量（L）'] || 0);
+                return stockDays < 15 && dailyConsumption > 0;
+            });
+            
+            // 按照库存天数升序排序
+            filteredLowStock.sort((a, b) => {
+                const aStockDays = Number(a['库存天数'] || 0);
+                const bStockDays = Number(b['库存天数'] || 0);
+                return aStockDays - bStockDays;
+            });
+            
+            filteredLowStock.forEach(item => {
+                const 药剂名称 = item['药剂名称'] || item['产品名称'] || '';
+                const 药剂型号 = item['药剂型号'] || item['型号'] || '';
+                const 平台 = item['平台'] || item['设施'] || '';
+                const 日消耗量 = Number(item['日消耗量'] || item['日消耗量（L）'] || 0);
+                const 现场库存量 = Number(item['现场库存量'] || 0);
+                const 库存天数 = Number(item['库存天数'] || 0);
+                
+                // 计算建议出运量（补充到30天库存）
+                const needVolume = 日消耗量 * (30 - 库存天数);
+                const suggestCanCount = Math.ceil(needVolume / 单罐升数);
+                
+                // 确定库存状态
+                let stockStatus = '';
+                let statusClass = '';
+                
+                if (库存天数 <= 3) {
+                    stockStatus = '极度紧缺';
+                    statusClass = 'badge-danger';
+                } else if (库存天数 <= 7) {
+                    stockStatus = '严重不足';
+                    statusClass = 'badge-danger';
+                } else if (库存天数 <= 10) {
+                    stockStatus = '库存紧张';
+                    statusClass = 'badge-warning';
+                } else {
+                    stockStatus = '库存偏低';
+                    statusClass = 'badge-warning';
+                }
+                
+                lowStockData.push({
+                    序号: serialNumber++,
+                    药剂名称: 药剂名称,
+                    型号: 药剂型号,
+                    送货设施: 平台,
+                    日消耗量: 日消耗量,
+                    现场库存量: 现场库存量,
+                    库存天数: 库存天数,
+                    库存状态: stockStatus,
+                    状态样式: statusClass,
+                    建议出运量: suggestCanCount
+                });
+            });
+            
+            renderLowStockTable();
+        }
+        
+        // 渲染低库存数据表
+        function renderLowStockTable() {
+            const tableBody = document.getElementById('lowStockTableBody');
+            tableBody.innerHTML = '';
+            
+            document.getElementById('lowStockCount').textContent = lowStockData.length;
+            
+            if (lowStockData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="9" class="px-3 py-8 text-center text-dark-text-secondary"><div class="flex flex-col items-center"><i class="fa fa-check-circle text-3xl text-green-400 mb-2"></i><p>所有药剂库存充足</p></div></td></tr>';
+                return;
+            }
+            
+            lowStockData.forEach(item => {
+                const row = tableBody.insertRow();
+                
+                // 根据库存天数设置行样式
+                if (item.库存天数 <= 7) {
+                    row.className = 'bg-red-900/10';
+                } else {
+                    row.className = 'bg-orange-900/10';
+                }
+                
+                row.innerHTML = `
+                    <td class="px-3 py-2">${item.序号}</td>
+                    <td class="px-3 py-2 font-medium">${item.药剂名称}</td>
+                    <td class="px-3 py-2">${item.型号}</td>
+                    <td class="px-3 py-2">${item.送货设施}</td>
+                    <td class="px-3 py-2 text-right">${item.日消耗量.toFixed(1)}</td>
+                    <td class="px-3 py-2 text-right">${item.现场库存量.toFixed(1)}</td>
+                    <td class="px-3 py-2 text-right font-medium ${item.库存天数 <= 7 ? 'text-red-400' : 'text-yellow-400'}">${item.库存天数.toFixed(1)}</td>
+                    <td class="px-3 py-2">
+                        <span class="badge ${item.状态样式}">
+                            ${item.库存状态}
+                        </span>
+                    </td>
+                    <td class="px-3 py-2 text-center font-medium text-primary">${item.建议出运量} 罐</td>
+                `;
+            });
+        }
+        
+        // 导出低库存数据
+        function exportLowStockExcel() {
+            if (lowStockData.length === 0) {
+                showToast('error', '导出失败', '暂无低库存数据可导出！');
+                return;
+            }
+            
+            const exportData = lowStockData.map(item => {
+                return {
+                    ...item,
+                    '库存状态': item.库存状态,
+                    '建议出运量': `${item.建议出运量} 罐`
+                };
+            });
+            
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "低于15日库存的药剂库存数据表");
+            const now = new Date();
+            const formatDate = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,0)}${now.getDate().toString().padStart(2,0)}-${now.getHours().toString().padStart(2,0)}${now.getMinutes().toString().padStart(2,0)}${now.getSeconds().toString().padStart(2,0)}`;
+            XLSX.writeFile(workbook, `低于15日库存的药剂库存数据表_${formatDate}.xlsx`);
+            
+            showToast('success', '导出成功', '低库存数据表已成功导出');
+        }
+        
+        // 清除衰减记录
+        function clearAttenuateRecords() {
+            if (confirm('确定要清除所有衰减记录吗？清除后无法恢复！')) {
+                attenuateLogData = [];
+                updatedOrderData = [];
+                matchComparisonData = [];
+                document.getElementById('attenuateLogBody').innerHTML = '<tr><td colspan="10" class="px-3 py-4 text-center text-dark-text-secondary">暂无衰减操作记录</td></tr>';
+                document.getElementById('attenuateResultArea').style.display = 'none';
+                document.getElementById('downloadAttenuateBtn').disabled = true;
+                
+                // 重置图表
+                if (attenuateStatsChart) {
+                    attenuateStatsChart.destroy();
+                    attenuateStatsChart = null;
+                }
+                
+                showToast('success', '清除成功', '已清除所有衰减记录！');
+            }
+        }
+        
+        // ====================== UI相关函数 ======================
+        
+        // 渲染表格（带分页）
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="14" class="px-3 py-8 text-center text-dark-text-secondary"><div class="flex flex-col items-center"><i class="fa fa-search text-3xl text-dark-border mb-2"></i><p>暂无符合条件的数据</p></div></td></tr>';
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+            
+            // 计算当前页显示的数据范围
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            pageData.forEach((item) => {
+                // 根据经营项目预算名称自动识别作业区
+                const 经营项目预算名称 = item.经营项目预算名称 || '';
+                const 送货设施 = item.送货设施 || '';
+                let 作业区 = '';
+                
+                // 检查是否为实验耗材
+                const isExperimentMaterial = 实验耗材预算项目列表.includes(经营项目预算名称);
+                
+                if (isExperimentMaterial) {
+                    // 实验耗材根据设施平台区分作业区
+                    if (送货设施.includes('番禺') || 送货设施.includes('PY')) {
+                        作业区 = '番禺';
+                    } else if (送货设施.includes('流花') || 送货设施.includes('LH') || 送货设施.includes('HYSY122')) {
+                        作业区 = '流花';
+                    } else {
+                        作业区 = '其他';
+                    }
+                } else {
+                    // 非实验耗材根据经营项目预算名称区分作业区
+                    if (经营项目预算名称.includes('番禺')) {
+                        作业区 = '番禺';
+                    } else if (经营项目预算名称.includes('流花')) {
+                        作业区 = '流花';
+                    } else {
+                        作业区 = '其他';
+                    }
+                }
+                const leftDays = expireLeftDaysMap.get(item.序号 - 1);
+                const isExpired = orderExpireMap.get(item.序号 - 1);
+                const stockDays = stockDaysMap.get(item.序号 - 1) || 0;
+                const isOverOrder = overOrderMap.get(item.序号 - 1) || false;
+                const maxCan = originMaxCanMap.get(item.序号 -1) || 0;
+                let daysHtml = '';
+                let warnIcon = '';
+                let rowClass = '';
+                
+                if(leftDays === null || item.合同或订单号 === '总包药剂'){
+                    daysHtml = '无订单';
+                }else if(isExpired){
+                    warnIcon = '<i class="fa fa-exclamation-circle text-red-400 mr-1"></i>';
+                    daysHtml = `${warnIcon}已超期${Math.abs(leftDays)}天`;
+                }else if(leftDays <= WARN_DAYS && leftDays >=0){
+                    warnIcon = '<i class="fa fa-clock-o text-yellow-400 mr-1"></i>';
+                    daysHtml = `${warnIcon}剩余${leftDays}天`;
+                }else{
+                    warnIcon = '<i class="fa fa-check-circle text-green-400 mr-1"></i>';
+                    daysHtml = `${warnIcon}剩余${leftDays}天`;
+                }
+                
+                // 设置行样式
+                if(isOverOrder){
+                    rowClass = 'bg-red-900/10 text-dark-text';
+                    daysHtml = `<i class="fa fa-exclamation-triangle text-red-400 mr-1"></i>超订单【最大可出${maxCan}罐】`;
+                }else if(isExpired){
+                    rowClass = 'bg-red-900/05';
+                }else if(stockDays < 15){
+                    rowClass = 'bg-orange-900/05';
+                }else if(leftDays !== null && leftDays >=0 && leftDays <= WARN_DAYS){
+                    rowClass = 'bg-yellow-900/05';
+                }else if(stockDays > 30){
+                    rowClass = 'bg-green-900/05';
+                }else if(item.合同或订单号 === '总包药剂'){
+                    rowClass = 'bg-blue-900/05';
+                }
+                
+                const row = tableBody.insertRow();
+                row.className = rowClass;
+                
+                row.innerHTML = `
+                    <td class="px-3 py-2">${item.序号}</td>
+                    <td class="px-3 py-2">${item.船期日期}</td>
+                    <td class="px-3 py-2">${item.要料单位}</td>
+                    <td class="px-3 py-2">${item.经营项目预算名称}</td>
+                    <td class="px-3 py-2">${item.合同或订单号}</td>
+                    <td class="px-3 py-2 font-medium">${作业区}</td>
+                    <td class="px-3 py-2">${item.送货设施}</td>
+                    <td class="px-3 py-2">${item.产品名称}</td>
+                    <td class="px-3 py-2">${item.型号}</td>
+                    <td class="px-3 py-2 text-right font-medium">${item.出运包装量}</td>
+                    <td class="px-3 py-2">${item.包装形式}</td>
+                    <td class="px-3 py-2">
+                        <div class="edit-remark" contenteditable="true" onfocus="startEditRemark(this)" onblur="saveRemarkBySerial(${item.序号}, this.innerText, this)" class="min-w-[220px] p-1 border border-transparent hover:border-dark-border rounded focus:outline-none focus:border-primary focus:bg-blue-900/30">${item.备注 || ''}</div>
+                    </td>
+                    <td class="px-3 py-2">
+                        <span class="${isOverOrder ? 'text-red-400 font-medium' : isExpired ? 'text-red-400' : (leftDays !== null && leftDays >=0 && leftDays <= WARN_DAYS ? 'text-yellow-400' : 'text-green-400')}">
+                            ${daysHtml}
+                        </span>
+                    </td>
+                    <td class="px-3 py-2 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button class="btn btn-primary px-2 py-1 text-xs btn-animated" onclick="editRowBySerial(${item.序号})">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button class="btn btn-info px-2 py-1 text-xs btn-animated" onclick="copyRowBySerial(${item.序号})" title="复制整行数据">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                            <button class="btn btn-danger px-2 py-1 text-xs btn-animated" onclick="deleteRowBySerial(${item.序号})">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+            });
+            
+            // 更新分页信息
+            document.getElementById('startRecord').textContent = startIndex + 1;
+            document.getElementById('endRecord').textContent = endIndex;
+            document.getElementById('totalRecordCount').textContent = filteredData.length;
+            
+            document.getElementById('pagination').style.display = filteredData.length > pageSize ? 'flex' : 'none';
+        }
+        
+        // 渲染分页控件
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            
+            // 限制显示的页码数量
+            const maxVisiblePages = 7; // 增加可见页码数量
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // 添加页码按钮
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement('button');
+                button.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                button.textContent = i;
+                button.onclick = () => {
+                    // 添加按钮点击动画
+                    button.classList.add('animate-button-bounce');
+                    setTimeout(() => {
+                        button.classList.remove('animate-button-bounce');
+                    }, 300);
+                    
+                    currentPage = i;
+                    renderPagination();
+                    renderTable();
+                };
+                pageNumbers.appendChild(button);
+            }
+            
+            // 更新分页按钮状态
+            document.getElementById('firstPage').disabled = currentPage === 1;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            document.getElementById('lastPage').disabled = currentPage === totalPages;
+            
+            // 添加分页按钮事件
+            document.getElementById('firstPage').onclick = () => {
+                if (currentPage !== 1) {
+                    // 添加按钮点击动画
+                    document.getElementById('firstPage').classList.add('animate-button-bounce');
+                    setTimeout(() => {
+                        document.getElementById('firstPage').classList.remove('animate-button-bounce');
+                    }, 300);
+                    
+                    currentPage = 1;
+                    renderPagination();
+                    renderTable();
+                }
+            };
+            
+            document.getElementById('prevPage').onclick = () => {
+                if (currentPage > 1) {
+                    // 添加按钮点击动画
+                    document.getElementById('prevPage').classList.add('animate-button-bounce');
+                    setTimeout(() => {
+                        document.getElementById('prevPage').classList.remove('animate-button-bounce');
+                    }, 300);
+                    
+                    currentPage--;
+                    renderPagination();
+                    renderTable();
+                }
+            };
+            
+            document.getElementById('nextPage').onclick = () => {
+                if (currentPage < totalPages) {
+                    // 添加按钮点击动画
+                    document.getElementById('nextPage').classList.add('animate-button-bounce');
+                    setTimeout(() => {
+                        document.getElementById('nextPage').classList.remove('animate-button-bounce');
+                    }, 300);
+                    
+                    currentPage++;
+                    renderPagination();
+                    renderTable();
+                }
+            };
+            
+            document.getElementById('lastPage').onclick = () => {
+                if (currentPage !== totalPages) {
+                    // 添加按钮点击动画
+                    document.getElementById('lastPage').classList.add('animate-button-bounce');
+                    setTimeout(() => {
+                        document.getElementById('lastPage').classList.remove('animate-button-bounce');
+                    }, 300);
+                    
+                    currentPage = totalPages;
+                    renderPagination();
+                    renderTable();
+                }
+            };
+        }
+        
+        // 显示编辑模态框
+        function showEditModal(index) {
+            const item = originDemandData[index];
+            const dataIndex = item.序号 - 1;
+            const storedMaxCan = originMaxCanMap.get(dataIndex);
+            const isZongBao = item.合同或订单号 === '总包药剂';
+            const isExperimentMaterial = item.包装形式 === 'EA';
+            
+            // 对于实验室耗材，使用订单剩余数量作为最大可出数量
+            let maxCan = storedMaxCan || 999999;
+            if (isExperimentMaterial && (!storedMaxCan || storedMaxCan === 999999)) {
+                maxCan = Math.max(parseFloat(item.订单剩余数量) || 0, 1); // 使用订单剩余数量，确保至少为1
+            }
+            
+            document.getElementById('editModalTitle').textContent = `编辑【${item.产品名称}-${item.型号}】的出运包装量(${isExperimentMaterial ? 'EA' : '罐'})`;
+            document.getElementById('editCanInput').value = item.出运包装量;
+            
+            if (isZongBao) {
+                document.getElementById('editModalHint').textContent = '总包药剂无限制';
+            } else if (isExperimentMaterial) {
+                document.getElementById('editModalHint').textContent = `实验室耗材，最大可出：${maxCan} EA`;
+            } else {
+                document.getElementById('editModalHint').textContent = `订单最大可出：${maxCan} 罐`;
+            }
+            
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+        
+        // 隐藏编辑模态框
+        function hideEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            currentEditIndex = -1;
+        }
+        
+        // 确认编辑
+        function confirmEdit() {
+            if (currentEditIndex === -1) return;
+            
+            const item = originDemandData[currentEditIndex];
+            const dataIndex = item.序号 - 1;
+            const storedMaxCan = originMaxCanMap.get(dataIndex);
+            const isZongBao = item.合同或订单号 === '总包药剂';
+            const isExperimentMaterial = item.包装形式 === 'EA';
+            const unit = isExperimentMaterial ? 'EA' : '罐';
+            
+            // 对于实验室耗材，使用订单剩余数量作为最大可出数量
+            let maxCan = storedMaxCan || 999999;
+            if (isExperimentMaterial && (!storedMaxCan || storedMaxCan === 999999)) {
+                maxCan = Math.max(parseFloat(item.订单剩余数量) || 0, 1); // 使用订单剩余数量，确保至少为1
+            }
+            
+            const newCan = parseInt(document.getElementById('editCanInput').value);
+            
+            if (isNaN(newCan) || newCan <= 0) {
+                showToast('error', '输入错误', `请输入有效的正整数${unit}数！`);
+                return;
+            }
+            
+            if (!isZongBao && newCan > maxCan) {
+                overOrderMap.set(dataIndex, true);
+                showToast('warning', '超出限制', `您填写的${newCan}${unit} 超过该订单最大可出运${unit}数${maxCan}${unit}，已标记【超订单】！`);
+            } else {
+                overOrderMap.set(dataIndex, false);
+            }
+            
+            // 对于实验室耗材，确保不超过订单剩余数量
+            if (isExperimentMaterial) {
+                const orderRemaining = parseFloat(item.订单剩余数量) || 0;
+                if (newCan > orderRemaining) {
+                    showToast('error', '超出订单剩余量', `实验室耗材最多可出${orderRemaining} EA！`);
+                    return;
+                }
+            }
+            
+            // 记录旧值用于显示变更
+            const oldValue = item.出运包装量;
+            
+            // 更新数据
+            originDemandData[currentEditIndex].出运包装量 = newCan;
+            
+            hideEditModal();
+            resetFilterTable();
+            showToast('success', '编辑成功', `已将出运包装量从 ${oldValue}${unit} 更改为 ${newCan}${unit}`);
+            updateDashboardStats();
+        }
+        
+        // 显示加载状态
+        function showLoading(message) {
+            // 创建加载遮罩
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loadingOverlay';
+            loadingOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            loadingOverlay.innerHTML = `
+                <div class="bg-dark-card rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
+                    <div class="loading-spinner"></div>
+                    <p class="text-dark-text">${message || '正在处理，请稍候...'}</p>
+                </div>
+            `;
+            document.body.appendChild(loadingOverlay);
+        }
+        
+        // 隐藏加载状态
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+        
+        // 显示提示消息
+        function showToast(type, title, message) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // 设置图标和颜色
+            let iconClass = '';
+            let iconBg = '';
+            
+            switch (type) {
+                case 'success':
+                    iconClass = 'fa fa-check';
+                    iconBg = 'bg-green-900/30 text-green-400';
+                    break;
+                case 'error':
+                    iconClass = 'fa fa-times';
+                    iconBg = 'bg-red-900/30 text-red-400';
+                    break;
+                case 'warning':
+                    iconClass = 'fa fa-exclamation';
+                    iconBg = 'bg-yellow-900/30 text-yellow-400';
+                    break;
+                case 'info':
+                    iconClass = 'fa fa-info';
+                    iconBg = 'bg-blue-900/30 text-blue-400';
+                    break;
+                default:
+                    iconClass = 'fa fa-info';
+                    iconBg = 'bg-blue-900/30 text-blue-400';
+            }
+            
+            toastIcon.className = `w-8 h-8 rounded-full flex items-center justify-center ${iconBg}`;
+            toastIcon.innerHTML = `<i class="fa ${iconClass}"></i>`;
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            // 显示提示
+            toast.classList.remove('translate-x-full');
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+        
+        // 更新仪表板统计数据
+        function updateDashboardStats() {
+            const pendingCount = originDemandData.length;
+            const expiringCount = Array.from(expireLeftDaysMap.values()).filter(v => v !== null && v >= 0 && v <= WARN_DAYS).length;
+            const overOrderCount = Array.from(overOrderMap.values()).filter(v => v).length;
+            const completedCount = updatedOrderData ? updatedOrderData.filter(order => order['订单状态'] === '已完成').length : 0;
+            
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('expiringCount').textContent = expiringCount;
+            document.getElementById('overOrderCount').textContent = overOrderCount;
+            document.getElementById('completedCount').textContent = completedCount;
+            
+            // 更新订单状态分布图表
+            if (orderStatusChart) {
+                updateOrderStatusChart(pendingCount, expiringCount, overOrderCount, completedCount);
+            }
+        }
+        
+        // 初始化3D背景效果
+        function initThreeBackground() {
+            const canvas = document.getElementById('threeBackground');
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                alpha: true,
+                antialias: true
+            });
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // 创建粒子系统
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1000;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            const colorsArray = new Float32Array(particlesCount * 3);
+            
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+                
+                // 蓝色主题的粒子颜色
+                colorsArray[i * 3] = 0.1;
+                colorsArray[i * 3 + 1] = 0.3 + Math.random() * 0.3;
+                colorsArray[i * 3 + 2] = 0.8 + Math.random() * 0.2;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            // 动画循环
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.x += 0.0005;
+                particlesMesh.rotation.y += 0.0005;
+                
+                renderer.render(scene, camera);
+            }
+            
+            // 响应式调整
+            function resizeRenderer() {
+                const container = canvas.parentElement;
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            }
+            
+            window.addEventListener('resize', resizeRenderer);
+            resizeRenderer();
+            animate();
+        }
+        
+        function initCharts() {
+            // 订单状态分布图表
+            const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+            if (orderStatusChart) {
+                orderStatusChart.destroy();
+            }
+            
+            const pendingCount = originDemandData.length;
+            const expiringCount = Array.from(expireLeftDaysMap.values()).filter(v => v !== null && v >= 0 && v <= WARN_DAYS).length;
+            const overOrderCount = Array.from(overOrderMap.values()).filter(v => v).length;
+            const completedCount = updatedOrderData ? updatedOrderData.filter(order => order['订单状态'] === '已完成').length : 0;
+            
+            orderStatusChart = new Chart(orderStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['待处理', '即将到期', '超订单', '已完成'],
+                    datasets: [{
+                        data: [pendingCount, expiringCount, overOrderCount, completedCount],
+                        backgroundColor: [
+                            'rgba(22, 119, 255, 0.9)', // 蓝色 - 待处理
+                            'rgba(250, 140, 22, 0.9)', // 黄色 - 即将到期
+                            'rgba(255, 77, 79, 0.9)', // 红色 - 超订单
+                            'rgba(82, 196, 26, 0.9)'  // 绿色 - 已完成
+                        ],
+                        borderColor: [
+                            'rgba(22, 119, 255, 1)',
+                            'rgba(250, 140, 22, 1)',
+                            'rgba(255, 77, 79, 1)',
+                            'rgba(82, 196, 26, 1)'
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                color: '#e2e8f0',
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        const dataset = data.datasets[0];
+                                        const total = dataset.data.reduce((a, b) => a + b, 0);
+                                        return data.labels.map((label, i) => {
+                                            const value = dataset.data[i];
+                                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                            return {
+                                                text: `${label}: ${value} (${percentage}%)`,
+                                                fillStyle: dataset.backgroundColor[i],
+                                                strokeStyle: dataset.borderColor ? dataset.borderColor[i] : undefined,
+                                                lineWidth: dataset.borderWidth,
+                                                hidden: isNaN(value) || value < 0,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+            
+            // 药剂需求量趋势图表
+            const demandTrendCtx = document.getElementById('demandTrendChart').getContext('2d');
+            if (demandTrendChart) {
+                demandTrendChart.destroy();
+            }
+            
+            // 从日报数据生成真实的趋势数据
+            const chartData = generateTrendChartData('all');
+            
+            // 更新库存统计信息
+            updateStockStatistics(chartData);
+            
+            demandTrendChart = new Chart(demandTrendCtx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                color: '#e2e8f0',
+                                generateLabels: function(chart) {
+                                    return [
+                                        {
+                                            text: '正常库存药剂',
+                                            fillStyle: 'rgba(22, 119, 255, 0.7)',
+                                            strokeStyle: 'rgba(22, 119, 255, 1)',
+                                            lineWidth: 1,
+                                            hidden: false,
+                                            index: 0
+                                        },
+                                        {
+                                            text: '低库存药剂 (<15天)',
+                                            fillStyle: 'rgba(255, 77, 79, 0.7)',
+                                            strokeStyle: 'rgba(255, 77, 79, 1)',
+                                            lineWidth: 1,
+                                            hidden: false,
+                                            index: 1
+                                        }
+                                    ];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                },
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const metaData = context.dataset.metaData[index];
+                                    return [
+                                        `日消耗量: ${context.raw} L`,
+                                        `库存天数: ${metaData.stockDays} 天`,
+                                        `现场库存: ${metaData.currentStock} L`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                maxTicksLimit: 10,
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value);
+                                    // 如果标签太长，截断显示
+                                    return label.length > 15 ? label.substring(0, 15) + '...' : label;
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            title: {
+                                display: true,
+                                text: '日消耗量 (L)',
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 生成趋势图表数据
+        function generateTrendChartData(filterType) {
+            if (!dailyReportData.length) {
+                return {
+                    labels: ['暂无数据'],
+                    datasets: [{
+                        label: '日消耗量(L)',
+                        data: [0],
+                        backgroundColor: 'rgba(22, 119, 255, 0.7)',
+                        borderColor: 'rgba(22, 119, 255, 1)',
+                        borderWidth: 1
+                    }]
+                };
+            }
+            
+            // 筛选数据
+            let filteredData = [...dailyReportData];
+            if (filterType === 'lowStock') {
+                filteredData = filteredData.filter(item => {
+                    const stockDays = Number(item['库存天数'] || 0);
+                    return stockDays < 15;
+                });
+            }
+            
+            // 按药剂型号分组并计算平均日消耗量
+            const medicineMap = new Map();
+            filteredData.forEach(item => {
+                const 药剂名称 = item['药剂名称'] || item['产品名称'] || '';
+                const 药剂型号 = item['药剂型号'] || item['型号'] || '';
+                const 完整名称 = `${药剂名称}-${药剂型号}`;
+                const 日消耗量 = Number(item['日消耗量'] || item['日消耗量（L）'] || 0);
+                const 库存天数 = Number(item['库存天数'] || 0);
+                const 现场库存 = Number(item['现场库存量'] || 0);
+                
+                if (完整名称 && 日消耗量 > 0) {
+                    medicineMap.set(完整名称, {
+                        dailyConsumption: 日消耗量,
+                        stockDays: 库存天数,
+                        currentStock: 现场库存
+                    });
+                }
+            });
+            
+            // 转换为图表数据
+            const labels = [];
+            const data = [];
+            const backgroundColors = [];
+            const borderColors = [];
+            const metaData = [];
+            
+            // 按日消耗量排序
+            const sortedMedicines = Array.from(medicineMap.entries())
+                .sort((a, b) => b[1].dailyConsumption - a[1].dailyConsumption)
+                .slice(0, 15); // 只显示前15个
+            
+            sortedMedicines.forEach(([name, info]) => {
+                labels.push(name);
+                data.push(info.dailyConsumption);
+                metaData.push(info);
+                
+                // 根据库存天数设置颜色
+                if (info.stockDays < 15) {
+                    backgroundColors.push('rgba(255, 77, 79, 0.7)'); // 红色 - 低库存
+                    borderColors.push('rgba(255, 77, 79, 1)');
+                } else {
+                    backgroundColors.push('rgba(22, 119, 255, 0.7)'); // 蓝色 - 正常库存
+                    borderColors.push('rgba(22, 119, 255, 1)');
+                }
+            });
+            
+            return {
+                labels: labels,
+                datasets: [{
+                    label: '日消耗量(L)',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                    metaData: metaData
+                }]
+            };
+        }
+        
+        // 更新趋势图表
+        function updateTrendChart(filterType = 'all') {
+            if (!demandTrendChart) return;
+            
+            const chartData = generateTrendChartData(filterType);
+            demandTrendChart.data = chartData;
+            demandTrendChart.update();
+            
+            // 更新库存统计信息
+            updateStockStatistics(chartData);
+        }
+        
+        // 更新库存统计信息
+        function updateStockStatistics(chartData) {
+            const lowStockCount = document.getElementById('lowStockCount');
+            const normalStockCount = document.getElementById('normalStockCount');
+            
+            if (!lowStockCount || !normalStockCount || !chartData.labels) {
+                return;
+            }
+            
+            let lowStock = 0;
+            let normalStock = 0;
+            
+            // 统计低库存和正常库存的药剂数量
+            chartData.labels.forEach((label, index) => {
+                const metaData = chartData.datasets[0].metaData[index];
+                if (metaData && metaData.stockDays < 15) {
+                    lowStock++;
+                } else {
+                    normalStock++;
+                }
+            });
+            
+            lowStockCount.textContent = `低库存: ${lowStock}种`;
+            normalStockCount.textContent = `正常: ${normalStock}种`;
+        }
+        
+        // 更新订单状态分布图表
+        function updateOrderStatusChart(pendingCount, expiringCount, overOrderCount, completedCount) {
+            if (orderStatusChart) {
+                orderStatusChart.data.datasets[0].data = [pendingCount, expiringCount, overOrderCount, completedCount];
+                orderStatusChart.update();
+            }
+        }
+        
+        // 更新衰减统计图表
+        function updateAttenuateStatsChart(totalShipment, matchedCount, attenuatedCount, overShipmentCount, completedOrderCount) {
+            const ctx = document.getElementById('attenuateStatsChart').getContext('2d');
+            
+            if (attenuateStatsChart) {
+                attenuateStatsChart.destroy();
+            }
+            
+            attenuateStatsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['总发货记录', '成功匹配', '实际衰减', '超量发货', '已完成订单'],
+                    datasets: [{
+                        label: '数量',
+                        data: [totalShipment, matchedCount, attenuatedCount, overShipmentCount, completedOrderCount],
+                        backgroundColor: [
+                            'rgba(22, 119, 255, 0.7)',   // 蓝色 - 总发货记录
+                            'rgba(82, 196, 26, 0.7)',    // 绿色 - 成功匹配
+                            'rgba(139, 92, 246, 0.7)',   // 紫色 - 实际衰减
+                            'rgba(255, 77, 79, 0.7)',    // 红色 - 超量发货
+                            'rgba(250, 140, 22, 0.7)'    // 橙色 - 已完成订单
+                        ],
+                        borderColor: [
+                            'rgba(22, 119, 255, 1)',
+                            'rgba(82, 196, 26, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(255, 77, 79, 1)',
+                            'rgba(250, 140, 22, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.raw || 0;
+                                    return `${label}: ${value}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 初始化背景动画
+        function initBackgroundAnimation() {
+            const canvas = document.getElementById('animationBackground');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            let points = [];
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            // 创建初始点阵
+            for (let i = 0; i < 50; i++) {
+                points.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5
+                });
+            }
+            
+            // 鼠标移动监听
+            document.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+            
+            // 动画循环
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#1677ff';
+                ctx.lineWidth = 0.5;
+                
+                for (let i = 0; i < points.length; i++) {
+                    const point = points[i];
+                    
+                    // 更新点的位置
+                    point.x += point.speedX;
+                    point.y += point.speedY;
+                    
+                    // 边界检查
+                    if (point.x < 0 || point.x > canvas.width) point.speedX *= -1;
+                    if (point.y < 0 || point.y > canvas.height) point.speedY *= -1;
+                    
+                    // 绘制点
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
+                    ctx.fillStyle = '#1677ff';
+                    ctx.fill();
+                    
+                    // 绘制连接线
+                    for (let j = i + 1; j < points.length; j++) {
+                        const otherPoint = points[j];
+                        const distance = Math.sqrt(
+                            Math.pow(point.x - otherPoint.x, 2) + 
+                            Math.pow(point.y - otherPoint.y, 2)
+                        );
+                        
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.moveTo(point.x, point.y);
+                            ctx.lineTo(otherPoint.x, otherPoint.y);
+                            ctx.stroke();
+                        }
+                    }
+                    
+                    // 鼠标交互
+                    const mouseDistance = Math.sqrt(
+                        Math.pow(point.x - mouseX, 2) + 
+                        Math.pow(point.y - mouseY, 2)
+                    );
+                    
+                    if (mouseDistance < 150) {
+                        const angle = Math.atan2(mouseY - point.y, mouseX - point.x);
+                        point.x += Math.cos(angle) * 0.2;
+                        point.y += Math.sin(angle) * 0.2;
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            // 窗口大小调整
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+        
+        // ====================== 页面加载与事件绑定 ======================
+        
+        window.onload = function() {
+            // 初始化背景动画
+            initBackgroundAnimation();
+            
+            // 加载记忆的文件
+            loadFileFromMemory('dailyReportCache', 'dailyReportFile', 'dailyMemo');
+            loadFileFromMemory('materialCodeCache', 'materialCodeFile', 'materialMemo');
+            loadFileFromMemory('orderCache', 'orderFile', 'orderMemo');
+            loadFileFromMemory('tankDynamicCache', 'tankDynamicFile', 'tankMemo');
+            loadFileFromMemory('shipmentCache', 'shipmentFile', 'shipmentMemo');
+            
+            // 文件上传事件绑定
+            document.getElementById('dailyReportFile').addEventListener('change', e => { 
+                if(e.target.files[0]) saveFileToMemory(e.target.files[0], 'dailyReportCache', 'dailyMemo'); 
+            });
+            document.getElementById('materialCodeFile').addEventListener('change', e => { 
+                if(e.target.files[0]) saveFileToMemory(e.target.files[0], 'materialCodeCache', 'materialMemo'); 
+            });
+            document.getElementById('orderFile').addEventListener('change', e => { 
+                if(e.target.files[0]) saveFileToMemory(e.target.files[0], 'orderCache', 'orderMemo'); 
+            });
+            document.getElementById('tankDynamicFile').addEventListener('change', e => { 
+                if(e.target.files[0]) saveFileToMemory(e.target.files[0], 'tankDynamicCache', 'tankMemo'); 
+            });
+            document.getElementById('shipmentFile').addEventListener('change', e => { 
+                if(e.target.files[0]) saveFileToMemory(e.target.files[0], 'shipmentCache', 'shipmentMemo'); 
+            });
+            
+            // 功能按钮绑定
+            document.getElementById('generateBtn').addEventListener('click', generateDemandTable);
+            document.getElementById('exportBtn').addEventListener('click', exportExcel);
+            document.getElementById('clearBtn').addEventListener('click', clearAllFileMemory);
+            document.getElementById('doFilter').addEventListener('click', doFilterTable);
+            document.getElementById('resetFilter').addEventListener('click', resetFilterTable);
+            
+            // 衰减功能按钮绑定
+            document.getElementById('attenuateBtn').addEventListener('click', executeOrderAttenuation);
+            document.getElementById('downloadAttenuateBtn').addEventListener('click', downloadAttenuateFiles);
+            document.getElementById('clearAttenuateBtn').addEventListener('click', clearAttenuateRecords);
+            
+            // 绑定低库存导出按钮事件
+            document.getElementById('exportLowStockBtn').addEventListener('click', exportLowStockExcel);
+            
+            // 编辑模态框事件绑定
+            document.getElementById('closeModal').addEventListener('click', hideEditModal);
+            document.getElementById('cancelEdit').addEventListener('click', hideEditModal);
+            document.getElementById('confirmEdit').addEventListener('click', confirmEdit);
+            
+            // 点击模态框外部关闭
+            document.getElementById('editModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideEditModal();
+                }
+            });
+            
+            // 趋势图筛选切换
+            document.getElementById('trendTimeRange').addEventListener('change', function() {
+                const filterType = this.value;
+                updateTrendChart(filterType);
+                
+                const filterText = filterType === 'lowStock' ? '仅低库存(&lt;15天)' : '所有药剂';
+                showToast('info', '提示', `趋势图已切换为显示${filterText}，数据已更新`);
+            });
+            
+            // 导出趋势图表
+            document.getElementById('exportTrendChartBtn').addEventListener('click', function() {
+                if (!demandTrendChart) {
+                    showToast('error', '导出失败', '暂无图表数据可导出');
+                    return;
+                }
+                
+                const canvas = document.getElementById('demandTrendChart');
+                const link = document.createElement('a');
+                link.download = `药剂需求趋势图表_${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                showToast('success', '导出成功', '趋势图表已成功导出为PNG图片');
+            });
+            
+            // 初始化3D背景效果
+            initThreeBackground();
+            
+            // 初始化图表
+            initCharts();
+            
+            // 显示欢迎提示
+            setTimeout(() => {
+                showToast('success', '欢迎使用', '油田化学番禺流花药剂管理系统已加载完成');
+            }, 1000);
+        };
+    </script>
+
+</body></html>
